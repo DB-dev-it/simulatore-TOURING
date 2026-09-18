@@ -4,25 +4,87 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Macchina di Turing</title>
+
 <style>
 *{box-sizing:border-box}
-body{font-family:Arial;margin:10px;color:#111}
-h1{font-size:25px;margin:4px 0 8px}
+
+body{
+ font-family:Arial;
+ margin:10px;
+ color:#111
+}
+
+h1{
+ font-size:25px;
+ margin:4px 0 8px
+}
+
 button,input,textarea{font:inherit}
-button{margin:2px;padding:5px 8px;cursor:pointer}
+
+button{
+ margin:2px;
+ padding:5px 8px;
+ cursor:pointer
+}
+
 input{max-width:100%}
-textarea{width:100%;height:150px;font-family:monospace}
+
+textarea{
+ width:100%;
+ height:150px;
+ font-family:monospace
+}
+
 .row{margin:6px 0}
+
 #school{display:none}
-.cfg{display:flex;flex-wrap:wrap;gap:7px;margin:7px 0}
-.cfg label{display:flex;flex-direction:column;font-size:12px}
+
+.cfg{
+ display:flex;
+ flex-wrap:wrap;
+ gap:7px;
+ margin:7px 0
+}
+
+.cfg label{
+ display:flex;
+ flex-direction:column;
+ font-size:12px
+}
+
 .cfg input{height:25px}
-.tab{overflow:auto;margin:7px 0}
-table{border-collapse:collapse}
-td,th{border:1px solid #999;padding:3px;text-align:center}
-th{background:#eee}
-td input{width:115px;border:0;text-align:center;font-family:monospace}
-.err{color:#b00000;font-size:13px;white-space:pre-wrap}
+
+.tab{
+ overflow:auto;
+ margin:7px 0
+}
+
+table{
+ border-collapse:collapse
+}
+
+td,th{
+ border:1px solid #999;
+ padding:3px;
+ text-align:center
+}
+
+th{
+ background:#eee
+}
+
+td input{
+ width:115px;
+ border:0;
+ text-align:center;
+ font-family:monospace
+}
+
+.err{
+ color:#b00000;
+ font-size:13px;
+ white-space:pre-wrap
+}
 
 #machine{
  width:min(100%,620px);
@@ -30,7 +92,7 @@ td input{width:115px;border:0;text-align:center;font-family:monospace}
  padding:10px;
  margin:10px 0;
  text-align:center;
- overflow:hidden;
+ overflow:hidden
 }
 
 #bubble{
@@ -48,7 +110,7 @@ td input{width:115px;border:0;text-align:center;font-family:monospace}
  justify-content:center;
  gap:5px;
  margin:12px auto 5px;
- width:100%;
+ width:100%
 }
 
 .scroll{
@@ -58,7 +120,7 @@ td input{width:115px;border:0;text-align:center;font-family:monospace}
  margin:0;
  flex:0 0 30px;
  font-size:20px;
- line-height:25px;
+ line-height:25px
 }
 
 .tape{
@@ -66,7 +128,7 @@ td input{width:115px;border:0;text-align:center;font-family:monospace}
  justify-content:center;
  overflow:hidden;
  width:420px;
- max-width:calc(100% - 70px);
+ max-width:calc(100% - 70px)
 }
 
 .cell{
@@ -81,7 +143,10 @@ td input{width:115px;border:0;text-align:center;font-family:monospace}
  font-family:monospace
 }
 
-.head{background:#ff38d8;font-weight:bold}
+.head{
+ background:#ff38d8;
+ font-weight:bold
+}
 
 #msg{
  font-size:12px;
@@ -114,15 +179,39 @@ td input{width:115px;border:0;text-align:center;font-family:monospace}
 .box h2{margin-top:0}
 
 @media(max-width:600px){
+
  body{margin:6px}
+
  h1{font-size:21px}
- button{font-size:12px;padding:4px 6px}
+
+ button{
+  font-size:12px;
+  padding:4px 6px
+ }
+
  textarea{height:125px}
- #machine{margin-left:0;width:100%;padding:6px}
+
+ #machine{
+  margin-left:0;
+  width:100%;
+  padding:6px
+ }
+
  .tape{width:270px}
- .cell{flex-basis:27px;width:27px;height:32px}
+
+ .cell{
+  flex-basis:27px;
+  width:27px;
+  height:32px
+ }
+
  td input{width:100px}
- .scroll{width:27px;flex-basis:27px;height:32px}
+
+ .scroll{
+  width:27px;
+  flex-basis:27px;
+  height:32px
+ }
 }
 </style>
 </head>
@@ -221,25 +310,47 @@ Stato: <b id="bubble">0</b>
 
 <ul>
 
-<li>Nel modo <b>NORMALE</b> usa:
-<code>(stato,simbolo)&gt;(lettera,stato,spostamento)</code></li>
+<li>
+Nel modo <b>NORMALE</b> usa:
+<code>(stato,simbolo)&gt;(lettera,stato,spostamento)</code>
+</li>
 
-<li>Nel modo <b>SCUOLA</b> ogni cella usa:
-<code>lettera,stato,spostamento</code></li>
+<li>
+Nel modo <b>SCUOLA</b> ogni cella usa:
+<code>lettera,stato,spostamento</code>
+</li>
 
-<li><b>S</b> sposta la testina a sinistra.</li>
+<li>
+<b>S</b> sposta la testina a sinistra.
+</li>
 
-<li><b>D</b> sposta la testina a destra.</li>
+<li>
+<b>D</b> sposta la testina a destra.
+</li>
 
-<li><b>*</b> rappresenta una casella vuota ed è sempre presente nella tabella.</li>
+<li>
+<b>*</b> rappresenta una casella vuota ed è sempre presente nella tabella.
+</li>
 
-<li>Lo stato <b>0</b> e lo stato <b>fine</b> sono sempre presenti.</li>
+<li>
+Lo stato <b>0</b> e lo stato <b>fine</b> sono sempre presenti.
+</li>
 
-<li>La macchina si ferma quando non trova una transizione compatibile con lo stato e il simbolo letto.</li>
+<li>
+La macchina si ferma quando non trova una transizione compatibile con lo stato e il simbolo letto.
+</li>
 
-<li>Il messaggio sotto il nastro indica il motivo dell'arresto.</li>
+<li>
+Quando viene raggiunto <b>fine</b>, la testina esegue comunque lo spostamento indicato nella transizione prima di fermarsi.
+</li>
 
-<li>Le frecce ai lati del nastro spostano la visualizzazione di 4 caselle alla volta.</li>
+<li>
+Il messaggio sotto il nastro indica il motivo dell'arresto.
+</li>
+
+<li>
+Le frecce ai lati del nastro spostano la visualizzazione di 4 caselle alla volta.
+</li>
 
 </ul>
 
@@ -258,6 +369,9 @@ let state="0";
 let timer;
 let view=0;
 
+
+/* CAMBIO MODALITÀ */
+
 function mode(x){
 
  scuola=x;
@@ -270,6 +384,9 @@ function mode(x){
  reset();
 }
 
+
+/* ISTRUZIONI */
+
 function apri(){
  $("modal").classList.add("open")
 }
@@ -277,6 +394,9 @@ function apri(){
 function chiudi(){
  $("modal").classList.remove("open")
 }
+
+
+/* GENERAZIONE TABELLA */
 
 function genera(){
 
@@ -290,15 +410,21 @@ function genera(){
   .map(x=>x.trim())
   .filter(Boolean);
 
- A=[...new Set(A.filter(x=>x!=""))];
-
- S=[...new Set(
-  S.filter(x=>x&&x!="0"&&x.toLowerCase()!="fine")
- )];
+ A=[...new Set(A)];
 
  if(!A.includes("*"))A.push("*");
 
+ S=[...new Set(
+  S.filter(x=>
+   x &&
+   x!="0" &&
+   x.toLowerCase()!="fine"
+  )
+ )];
+
  S=["0",...S,"fine"];
+
+ /* Conserva le istruzioni già scritte */
 
  let old={};
 
@@ -323,9 +449,10 @@ function genera(){
    let k=s+"|"+a;
 
    h+=`<td>
-   <input data-k="${k}"
-   value="${old[k]||""}"
-   placeholder="lettera,stato,D">
+   <input
+    data-k="${k}"
+    value="${old[k]||""}"
+    placeholder="lettera,stato,D">
    </td>`;
 
   });
@@ -336,7 +463,12 @@ function genera(){
  $("tab").innerHTML=h+"</table>";
 }
 
+
+/* LETTURA DEL PROGRAMMA */
+
 function leggi(){
+
+ /* MODALITÀ NORMALE */
 
  if(!scuola){
 
@@ -366,6 +498,9 @@ function leggi(){
    })
    .filter(Boolean);
  }
+
+
+ /* MODALITÀ SCUOLA */
 
  let a=[];
 
@@ -420,6 +555,9 @@ function leggi(){
  return a;
 }
 
+
+/* RESET */
+
 function reset(){
 
  ferma();
@@ -429,7 +567,9 @@ function reset(){
  view=0;
 
  state=(
-  scuola?$("statoS").value:$("stato").value
+  scuola
+  ?$("statoS").value
+  :$("stato").value
  ).trim()||"0";
 
  [...$("nastro").value].forEach((x,i)=>{
@@ -446,6 +586,7 @@ function reset(){
  }catch(e){
 
   rules=[];
+
   $("err").textContent=e.message;
   $("msg").textContent="Errore nel programma";
 
@@ -454,11 +595,19 @@ function reset(){
  render();
 }
 
+
+/* SIMBOLO LETTO */
+
 function sym(){
 
- return t[head]===undefined?"*":t[head];
+ return t[head]===undefined
+  ?"*"
+  :t[head];
 
 }
+
+
+/* ESECUZIONE DI UN PASSO */
 
 function passo(){
 
@@ -470,14 +619,23 @@ function passo(){
  }catch(e){
 
   $("err").textContent=e.message;
-  return false;
 
+  return false;
  }
+
+
+ /* CERCA LA TRANSIZIONE */
 
  let r=rules.find(x=>
   x.q==state &&
-  (x.r==sym()||(x.r=="*"&&sym()=="*"))
+  (
+   x.r==sym() ||
+   (x.r=="*"&&sym()=="*")
+  )
  );
+
+
+ /* NESSUNA TRANSIZIONE */
 
  if(!r){
 
@@ -493,29 +651,53 @@ function passo(){
   return false;
  }
 
- if(r.n.toLowerCase()=="fine"){
 
-  t[head]=r.w;
-  state="fine";
+ /* SCRITTURA */
 
-  $("bubble").textContent=state;
+ t[head]=r.w;
+
+
+ /* CAMBIO STATO */
+
+ state=r.n;
+
+
+ /* 
+    IMPORTANTE:
+    LA TESTINA SI SPOSTA SEMPRE,
+    ANCHE QUANDO IL NUOVO STATO È "fine"
+ */
+
+ head+=r.d=="D"?1:-1;
+
+
+ $("bubble").textContent=state;
+
+
+ /* AGGIORNA IL NASTRO */
+
+ render();
+
+
+ /* ARRIVO A FINE */
+
+ if(state.toLowerCase()=="fine"){
 
   $("msg").textContent=
-   "Fermata: raggiunto lo stato FINE.";
+   "Fermata: raggiunto lo stato FINE. Testina spostata "+
+   (
+    r.d=="D"
+    ?"a destra."
+    :"a sinistra."
+   );
 
-  render();
   ferma();
 
   return false;
  }
 
- t[head]=r.w;
 
- state=r.n;
-
- head+=r.d=="D"?1:-1;
-
- $("bubble").textContent=state;
+ /* PASSO NORMALE */
 
  $("msg").textContent=
   "Passo eseguito — scrivo "+
@@ -523,12 +705,17 @@ function passo(){
   ", stato "+
   state+
   ", testina "+
-  (r.d=="D"?"a destra":"a sinistra")+".";
-
- render();
+  (
+   r.d=="D"
+   ?"a destra"
+   :"a sinistra"
+  )+".";
 
  return true;
 }
+
+
+/* ESECUZIONE AUTOMATICA */
 
 function avvia(){
 
@@ -553,20 +740,28 @@ function avvia(){
  },200);
 }
 
+
+/* FERMA */
+
 function ferma(){
 
  clearInterval(timer);
- timer=null;
 
+ timer=null;
 }
+
+
+/* SCORRIMENTO VISIVO DEL NASTRO */
 
 function scrollTape(n){
 
  view+=n;
 
  render();
-
 }
+
+
+/* DISEGNA IL NASTRO */
 
 function render(){
 
@@ -586,20 +781,30 @@ function render(){
    `<div class="cell ${
     p==head?"head":""
    }">${
-    t[p]===undefined?"":t[p]
+    t[p]===undefined
+    ?""
+    :t[p]
    }</div>`;
 
  }
 
  $("tape").innerHTML=h;
-
 }
 
+
+/* EVENTI */
+
 $("stato").onchange=reset;
+
 $("statoS").onchange=reset;
+
 $("nastro").onchange=reset;
 
+
+/* AVVIO */
+
 genera();
+
 reset();
 
 </script>
