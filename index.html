@@ -7,211 +7,72 @@
 
 <style>
 *{box-sizing:border-box}
-
-body{
- font-family:Arial;
- margin:10px;
- color:#111
-}
-
-h1{
- font-size:25px;
- margin:4px 0 8px
-}
-
-button,input,textarea{font:inherit}
-
-button{
- margin:2px;
- padding:5px 8px;
- cursor:pointer
-}
-
-input{max-width:100%}
-
-textarea{
- width:100%;
- height:150px;
- font-family:monospace
-}
-
+body{font-family:Arial;margin:10px;color:#111}
+h1{font-size:25px;margin:4px 0 8px}
+button,input,textarea,select{font:inherit}
+button{margin:2px;padding:5px 8px;cursor:pointer}
+input,select{max-width:100%}
+textarea{width:100%;height:150px;font-family:monospace}
 .row{margin:6px 0}
-
 #school{display:none}
-
-.cfg{
- display:flex;
- flex-wrap:wrap;
- gap:7px;
- margin:7px 0
-}
-
-.cfg label{
- display:flex;
- flex-direction:column;
- font-size:12px
-}
-
+.cfg{display:flex;flex-wrap:wrap;gap:7px;margin:7px 0}
+.cfg label{display:flex;flex-direction:column;font-size:12px}
 .cfg input{height:25px}
-
-.tab{
- overflow:auto;
- margin:7px 0
-}
-
-table{
- border-collapse:collapse
-}
-
-td,th{
- border:1px solid #999;
- padding:3px;
- text-align:center
-}
-
-th{
- background:#eee
-}
-
-td input{
- width:115px;
- border:0;
- text-align:center;
- font-family:monospace
-}
-
-.err{
- color:#b00000;
- font-size:13px;
- white-space:pre-wrap
-}
-
+.tab{overflow:auto;margin:7px 0}
+table{border-collapse:collapse}
+td,th{border:1px solid #999;padding:3px;text-align:center}
+th{background:#eee}
+td input{width:115px;border:0;text-align:center;font-family:monospace}
+.err{color:#b00000;font-size:13px;white-space:pre-wrap}
+#gitMsg{font-size:12px;margin:4px 0}
 #machine{
- width:min(100%,620px);
- background:#10e8e8;
- padding:10px;
- margin:10px 0;
- text-align:center;
- overflow:hidden
+ width:min(100%,620px);background:#10e8e8;padding:10px;
+ margin:10px 0;text-align:center;overflow:hidden
 }
-
 #bubble{
- display:inline-block;
- background:white;
- border:2px solid #111;
- padding:2px 8px;
- border-radius:20px;
- margin-left:5px
+ display:inline-block;background:white;border:2px solid #111;
+ padding:2px 8px;border-radius:20px;margin-left:5px
 }
-
 .tapeBox{
- display:flex;
- align-items:center;
- justify-content:center;
- gap:5px;
- margin:12px auto 5px;
- width:100%
+ display:flex;align-items:center;justify-content:center;gap:5px;
+ margin:12px auto 5px;width:100%
 }
-
 .scroll{
- width:30px;
- height:35px;
- padding:0;
- margin:0;
- flex:0 0 30px;
- font-size:20px;
- line-height:25px
+ width:30px;height:35px;padding:0;margin:0;flex:0 0 30px;
+ font-size:20px;line-height:25px
 }
-
 .tape{
- display:flex;
- justify-content:center;
- overflow:hidden;
- width:420px;
- max-width:calc(100% - 70px)
+ display:flex;justify-content:center;overflow:hidden;
+ width:420px;max-width:calc(100% - 70px)
 }
-
 .cell{
- flex:0 0 27px;
- width:27px;
- height:35px;
- border:1px solid #999;
- background:white;
- display:flex;
- align-items:center;
- justify-content:center;
- font-family:monospace
+ flex:0 0 27px;width:27px;height:35px;border:1px solid #999;
+ background:white;display:flex;align-items:center;
+ justify-content:center;font-family:monospace
 }
-
-.head{
- background:#ff38d8;
- font-weight:bold
-}
-
-#msg{
- font-size:12px;
- background:#ffffffaa;
- padding:4px;
- margin-top:5px
-}
-
+.head{background:#ff38d8;font-weight:bold}
+#msg{font-size:12px;background:#ffffffaa;padding:4px;margin-top:5px}
 .modal{
- display:none;
- position:fixed;
- inset:0;
- background:#0008;
- align-items:center;
- justify-content:center;
- padding:15px
+ display:none;position:fixed;inset:0;background:#0008;
+ align-items:center;justify-content:center;padding:15px
 }
-
 .modal.open{display:flex}
-
 .box{
- background:white;
- padding:15px;
- max-width:600px;
- width:100%;
- max-height:85vh;
- overflow:auto
+ background:white;padding:15px;max-width:600px;width:100%;
+ max-height:85vh;overflow:auto
 }
-
 .box h2{margin-top:0}
 
 @media(max-width:600px){
-
  body{margin:6px}
-
  h1{font-size:21px}
-
- button{
-  font-size:12px;
-  padding:4px 6px
- }
-
+ button{font-size:12px;padding:4px 6px}
  textarea{height:125px}
-
- #machine{
-  margin-left:0;
-  width:100%;
-  padding:6px
- }
-
+ #machine{margin-left:0;width:100%;padding:6px}
  .tape{width:270px}
-
- .cell{
-  flex-basis:27px;
-  width:27px;
-  height:32px
- }
-
+ .cell{flex-basis:27px;width:27px;height:32px}
  td input{width:100px}
-
- .scroll{
-  width:27px;
-  flex-basis:27px;
-  height:32px
- }
+ .scroll{width:27px;flex-basis:27px;height:32px}
 }
 </style>
 </head>
@@ -246,6 +107,10 @@ Stato iniziale:
 
 <div class="cfg">
 
+<label>Nome progetto
+<input id="nomeProgetto" value="Nuovo progetto">
+</label>
+
 <label>Stato iniziale
 <input id="statoS" value="0">
 </label>
@@ -260,7 +125,28 @@ Stato iniziale:
 
 </div>
 
+<button onclick="nuovoProgetto()">Nuovo</button>
 <button onclick="genera()">Genera tabella</button>
+<button onclick="caricaComputer()">Carica</button>
+<button onclick="scaricaProgetto()">Scarica</button>
+
+<div class="row">
+<select id="progettiGit" style="min-width:180px">
+<option>Nessun progetto caricato</option>
+</select>
+<button onclick="listaGit()">Aggiorna Git</button>
+<button onclick="caricaGit()">Carica da Git</button>
+<button onclick="salvaGit()">Salva su Git</button>
+</div>
+
+<div id="gitMsg"></div>
+
+<input
+ id="fileInput"
+ type="file"
+ accept=".json,application/json"
+ style="display:none"
+ onchange="leggiFile(event)">
 
 <div class="tab" id="tab"></div>
 
@@ -287,13 +173,9 @@ Stato: <b id="bubble">0</b>
 </div>
 
 <div class="tapeBox">
-
 <button class="scroll" onclick="scrollTape(-4)">←</button>
-
 <div class="tape" id="tape"></div>
-
 <button class="scroll" onclick="scrollTape(4)">→</button>
-
 </div>
 
 <div id="msg">Pronto</div>
@@ -309,49 +191,18 @@ Stato: <b id="bubble">0</b>
 <h2>Istruzioni</h2>
 
 <ul>
-
-<li>
-Nel modo <b>NORMALE</b> usa:
-<code>(stato,simbolo)&gt;(lettera,stato,spostamento)</code>
-</li>
-
-<li>
-Nel modo <b>SCUOLA</b> ogni cella usa:
-<code>lettera,stato,spostamento</code>
-</li>
-
-<li>
-<b>S</b> sposta la testina a sinistra.
-</li>
-
-<li>
-<b>D</b> sposta la testina a destra.
-</li>
-
-<li>
-<b>*</b> rappresenta una casella vuota ed è sempre presente nella tabella.
-</li>
-
-<li>
-Lo stato <b>0</b> e lo stato <b>fine</b> sono sempre presenti.
-</li>
-
-<li>
-La macchina si ferma quando non trova una transizione compatibile con lo stato e il simbolo letto.
-</li>
-
-<li>
-Quando viene raggiunto <b>fine</b>, la testina esegue comunque lo spostamento indicato nella transizione prima di fermarsi.
-</li>
-
-<li>
-Il messaggio sotto il nastro indica il motivo dell'arresto.
-</li>
-
-<li>
-Le frecce ai lati del nastro spostano la visualizzazione di 4 caselle alla volta.
-</li>
-
+<li>Nel modo <b>NORMALE</b> usa:
+<code>(stato,simbolo)&gt;(lettera,stato,spostamento)</code></li>
+<li>Nel modo <b>SCUOLA</b> ogni cella usa:
+<code>lettera,stato,spostamento</code></li>
+<li><b>S</b> sposta la testina a sinistra.</li>
+<li><b>D</b> sposta la testina a destra.</li>
+<li><b>*</b> rappresenta una casella vuota.</li>
+<li>Lo stato <b>0</b> e lo stato <b>fine</b> sono sempre presenti.</li>
+<li>La macchina si ferma quando non trova una transizione compatibile.</li>
+<li>Quando viene raggiunto <b>fine</b>, la testina esegue comunque lo spostamento.</li>
+<li>Il messaggio sotto il nastro indica il motivo dell'arresto.</li>
+<li>Le frecce spostano la visualizzazione di 4 caselle.</li>
 </ul>
 
 </div>
@@ -361,361 +212,185 @@ Le frecce ai lati del nastro spostano la visualizzazione di 4 caselle alla volta
 
 const $=x=>document.getElementById(x);
 
-let scuola=0;
-let rules=[];
-let t={};
-let head=0;
-let state="0";
-let timer;
-let view=0;
+let scuola=0,rules=[],t={},head=0,state="0",timer,view=0;
 
-
-/* CAMBIO MODALITÀ */
+/* ---------------- MODALITÀ ---------------- */
 
 function mode(x){
-
  scuola=x;
-
  $("normal").style.display=x?"none":"block";
  $("school").style.display=x?"block":"none";
-
  if(x&&!$("tab").innerHTML)genera();
-
  reset();
+ if(x)listaGit();
 }
 
+/* ---------------- ISTRUZIONI ---------------- */
 
-/* ISTRUZIONI */
+function apri(){ $("modal").classList.add("open") }
+function chiudi(){ $("modal").classList.remove("open") }
 
-function apri(){
- $("modal").classList.add("open")
-}
-
-function chiudi(){
- $("modal").classList.remove("open")
-}
-
-
-/* GENERAZIONE TABELLA */
+/* ---------------- TABELLA ---------------- */
 
 function genera(){
 
- let A=$("alf").value
-  .split(",")
-  .map(x=>x.trim())
-  .filter(Boolean);
-
- let S=$("stati").value
-  .split(",")
-  .map(x=>x.trim())
-  .filter(Boolean);
+ let A=$("alf").value.split(",").map(x=>x.trim()).filter(Boolean);
+ let S=$("stati").value.split(",").map(x=>x.trim()).filter(Boolean);
 
  A=[...new Set(A)];
-
  if(!A.includes("*"))A.push("*");
 
- S=[...new Set(
-  S.filter(x=>
-   x &&
-   x!="0" &&
-   x.toLowerCase()!="fine"
-  )
- )];
-
+ S=[...new Set(S.filter(x=>x&&x!="0"&&x.toLowerCase()!="fine"))];
  S=["0",...S,"fine"];
 
- /* Conserva le istruzioni già scritte */
-
  let old={};
-
- document.querySelectorAll("#tab input").forEach(x=>{
-  old[x.dataset.k]=x.value;
- });
+ document.querySelectorAll("#tab input").forEach(x=>old[x.dataset.k]=x.value);
 
  let h="<table><tr><th>Stato \\ A</th>";
-
- A.forEach(a=>{
-  h+="<th>"+a+"</th>";
- });
-
+ A.forEach(a=>h+="<th>"+a+"</th>");
  h+="</tr>";
 
  S.forEach(s=>{
-
   h+="<tr><th>"+s+"</th>";
-
   A.forEach(a=>{
-
    let k=s+"|"+a;
-
-   h+=`<td>
-   <input
-    data-k="${k}"
-    value="${old[k]||""}"
-    placeholder="lettera,stato,D">
-   </td>`;
-
+   h+=`<td><input data-k="${k}" value="${old[k]||""}"
+   placeholder="lettera,stato,D"></td>`;
   });
-
   h+="</tr>";
  });
 
  $("tab").innerHTML=h+"</table>";
 }
 
-
-/* LETTURA DEL PROGRAMMA */
+/* ---------------- LETTURA PROGRAMMA ---------------- */
 
 function leggi(){
 
- /* MODALITÀ NORMALE */
-
  if(!scuola){
+  return $("prog").value.split("\n").map((x,i)=>{
+   x=x.trim();
+   if(!x)return null;
 
-  return $("prog").value
-   .split("\n")
-   .map((x,i)=>{
+   let m=x.match(/^\((.*?),(.*?)\)\s*>\s*\((.*?),(.*?),([SD])\)$/i);
 
-    x=x.trim();
+   if(!m)throw Error("Riga "+(i+1)+" non valida.");
 
-    if(!x)return null;
-
-    let m=x.match(
-     /^\((.*?),(.*?)\)\s*>\s*\((.*?),(.*?),([SD])\)$/i
-    );
-
-    if(!m)
-     throw Error("Riga "+(i+1)+" non valida.");
-
-    return{
-     q:m[1].trim(),
-     r:m[2].trim(),
-     w:m[4].trim(),
-     n:m[3].trim(),
-     d:m[5].toUpperCase()
-    };
-
-   })
-   .filter(Boolean);
+   return{
+    q:m[1].trim(),
+    r:m[2].trim(),
+    w:m[4].trim(),
+    n:m[3].trim(),
+    d:m[5].toUpperCase()
+   };
+  }).filter(Boolean);
  }
 
-
- /* MODALITÀ SCUOLA */
-
  let a=[];
-
- let heads=[
-  ...document.querySelectorAll("#tab th")
- ].map(x=>x.textContent);
+ let heads=[...document.querySelectorAll("#tab th")].map(x=>x.textContent);
 
  document.querySelectorAll("#tab tr").forEach((tr,i)=>{
-
   if(!i)return;
 
   let q=tr.cells[0].textContent;
 
   [...tr.querySelectorAll("input")].forEach((x,j)=>{
-
    if(!x.value.trim())return;
 
-   let p=x.value
-    .split(",")
-    .map(y=>y.trim());
+   let p=x.value.split(",").map(y=>y.trim());
 
    if(p.length!=3)
-    throw Error(
-     "Cella ("+q+","+heads[j+1]+
-     ") non valida: usa lettera,stato,spostamento."
-    );
+    throw Error("Cella ("+q+","+heads[j+1]+") non valida.");
 
    if(p[0].length!=1)
-    throw Error(
-     "Cella ("+q+","+heads[j+1]+
-     "): la lettera deve essere un solo carattere."
-    );
+    throw Error("Cella ("+q+","+heads[j+1]+"): lettera non valida.");
 
    if(!/^[SD]$/i.test(p[2]))
-    throw Error(
-     "Cella ("+q+","+heads[j+1]+
-     "): lo spostamento deve essere S oppure D."
-    );
+    throw Error("Cella ("+q+","+heads[j+1]+"): usa S oppure D.");
 
    a.push({
-    q:q,
-    r:heads[j+1],
-    w:p[0],
-    n:p[1],
-    d:p[2].toUpperCase()
+    q:q,r:heads[j+1],w:p[0],n:p[1],d:p[2].toUpperCase()
    });
-
   });
-
  });
 
  return a;
 }
 
-
-/* RESET */
+/* ---------------- RESET ---------------- */
 
 function reset(){
 
  ferma();
+ t={};head=0;view=0;
 
- t={};
- head=0;
- view=0;
+ state=(scuola?$ ("statoS"):$("stato")).value.trim()||"0";
 
- state=(
-  scuola
-  ?$("statoS").value
-  :$("stato").value
- ).trim()||"0";
-
- [...$("nastro").value].forEach((x,i)=>{
-  t[i]=x;
- });
+ [...$("nastro").value].forEach((x,i)=>t[i]=x);
 
  try{
-
   rules=leggi();
-
   $("err").textContent="";
   $("msg").textContent="Pronto";
-
  }catch(e){
-
   rules=[];
-
   $("err").textContent=e.message;
   $("msg").textContent="Errore nel programma";
-
  }
 
  render();
 }
 
-
-/* SIMBOLO LETTO */
-
 function sym(){
-
- return t[head]===undefined
-  ?"*"
-  :t[head];
-
+ return t[head]===undefined?"*":t[head];
 }
 
-
-/* ESECUZIONE DI UN PASSO */
+/* ---------------- ESECUZIONE ---------------- */
 
 function passo(){
 
  try{
-
   rules=leggi();
   $("err").textContent="";
-
  }catch(e){
-
   $("err").textContent=e.message;
-
   return false;
  }
-
-
- /* CERCA LA TRANSIZIONE */
 
  let r=rules.find(x=>
-  x.q==state &&
-  (
-   x.r==sym() ||
-   (x.r=="*"&&sym()=="*")
-  )
+  x.q==state&&(x.r==sym()||(x.r=="*"&&sym()=="*"))
  );
 
-
- /* NESSUNA TRANSIZIONE */
-
  if(!r){
-
   $("msg").textContent=
    'Fermata: nessuna transizione per stato "'+
-   state+
-   '" e simbolo "'+
-   sym()+
-   '".';
-
+   state+'" e simbolo "'+sym()+'".';
   ferma();
-
   return false;
  }
-
-
- /* SCRITTURA */
 
  t[head]=r.w;
-
-
- /* CAMBIO STATO */
-
  state=r.n;
-
-
- /* 
-    IMPORTANTE:
-    LA TESTINA SI SPOSTA SEMPRE,
-    ANCHE QUANDO IL NUOVO STATO È "fine"
- */
-
  head+=r.d=="D"?1:-1;
 
-
  $("bubble").textContent=state;
-
-
- /* AGGIORNA IL NASTRO */
-
  render();
 
-
- /* ARRIVO A FINE */
-
  if(state.toLowerCase()=="fine"){
-
   $("msg").textContent=
    "Fermata: raggiunto lo stato FINE. Testina spostata "+
-   (
-    r.d=="D"
-    ?"a destra."
-    :"a sinistra."
-   );
-
+   (r.d=="D"?"a destra.":"a sinistra.");
   ferma();
-
   return false;
  }
 
-
- /* PASSO NORMALE */
-
  $("msg").textContent=
-  "Passo eseguito — scrivo "+
-  r.w+
-  ", stato "+
-  state+
-  ", testina "+
-  (
-   r.d=="D"
-   ?"a destra"
-   :"a sinistra"
-  )+".";
+  "Passo eseguito — scrivo "+r.w+
+  ", stato "+state+", testina "+
+  (r.d=="D"?"a destra":"a sinistra")+".";
 
  return true;
 }
-
-
-/* ESECUZIONE AUTOMATICA */
 
 function avvia(){
 
@@ -724,87 +399,456 @@ function avvia(){
  let n=0;
 
  timer=setInterval(()=>{
-
   if(++n>10000){
-
-   $("msg").textContent=
-    "Fermata: raggiunto il limite di 10000 passi.";
-
+   $("msg").textContent="Fermata: limite di 10000 passi.";
    ferma();
-
    return;
   }
-
   if(!passo())ferma();
-
  },200);
 }
 
-
-/* FERMA */
-
 function ferma(){
-
  clearInterval(timer);
-
  timer=null;
 }
 
-
-/* SCORRIMENTO VISIVO DEL NASTRO */
+/* ---------------- NASTRO ---------------- */
 
 function scrollTape(n){
-
  view+=n;
-
  render();
 }
-
-
-/* DISEGNA IL NASTRO */
 
 function render(){
 
  $("bubble").textContent=state;
 
- let h="";
+ let h="",centro=head+view;
 
- let centro=head+view;
-
- for(
-  let p=centro-7;
-  p<=centro+7;
-  p++
- ){
-
-  h+=
-   `<div class="cell ${
-    p==head?"head":""
-   }">${
-    t[p]===undefined
-    ?""
-    :t[p]
-   }</div>`;
-
- }
+ for(let p=centro-7;p<=centro+7;p++)
+  h+=`<div class="cell ${p==head?"head":""}">${
+   t[p]===undefined?"":t[p]
+  }</div>`;
 
  $("tape").innerHTML=h;
 }
 
+/* =========================================================
+   PROGETTI
+   ========================================================= */
 
-/* EVENTI */
+function nuovoProgetto(){
+
+ $("nomeProgetto").value="Nuovo progetto";
+ $("statoS").value="0";
+ $("alf").value="X,Y,*";
+ $("stati").value="0,1,2,3,4";
+ $("nastro").value="";
+ genera();
+ reset();
+ $("gitMsg").textContent="";
+}
+
+/* crea JSON */
+
+function creaProgetto(){
+
+ let trans={};
+
+ document.querySelectorAll("#tab input").forEach(x=>{
+  if(x.value.trim())trans[x.dataset.k]=x.value.trim();
+ });
+
+ return{
+  version:1,
+  nome:$("nomeProgetto").value.trim()||"Nuovo progetto",
+  stato:$("statoS").value.trim()||"0",
+  alfabeto:$("alf").value.split(",").map(x=>x.trim()).filter(Boolean),
+  stati:$("stati").value.split(",").map(x=>x.trim()).filter(Boolean),
+  transizioni:trans,
+  nastro:$("nastro").value
+ };
+}
+
+/* carica JSON nella macchina */
+
+function applicaProgetto(p){
+
+ if(!p||typeof p!="object")throw Error("Progetto non valido.");
+
+ $("nomeProgetto").value=p.nome||"Nuovo progetto";
+ $("statoS").value=p.stato||"0";
+ $("alf").value=Array.isArray(p.alfabeto)?p.alfabeto.join(","):"X,Y,*";
+ $("stati").value=Array.isArray(p.stati)?p.stati.join(","):"0,1,2,3,4";
+ $("nastro").value=typeof p.nastro=="string"?p.nastro:"";
+
+ genera();
+
+ let tr=p.transizioni||{};
+
+ document.querySelectorAll("#tab input").forEach(x=>{
+  x.value=tr[x.dataset.k]||"";
+ });
+
+ reset();
+}
+
+/* scarica */
+
+function scaricaProgetto(){
+
+ try{
+
+  let p=creaProgetto();
+  let nome=p.nome.replace(/[\\/:*?"<>|]+/g,"_")||"progetto";
+
+  let blob=new Blob(
+   [JSON.stringify(p,null,2)],
+   {type:"application/json"}
+  );
+
+  let a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=nome+".json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+
+ }catch(e){
+  alert("Impossibile scaricare il progetto.");
+ }
+}
+
+/* carica computer */
+
+function caricaComputer(){
+ $("fileInput").click();
+}
+
+function leggiFile(e){
+
+ let f=e.target.files[0];
+ if(!f)return;
+
+ let r=new FileReader();
+
+ r.onload=()=>{
+  try{
+   applicaProgetto(JSON.parse(r.result));
+   $("gitMsg").textContent="Progetto caricato dal computer.";
+  }catch(x){
+   alert("File progetto non valido.");
+  }
+  e.target.value="";
+ };
+
+ r.readAsText(f);
+}
+
+/* =========================================================
+   GITHUB LETTURA
+   ========================================================= */
+
+async function listaGit(){
+
+ let s=$("progettiGit");
+
+ try{
+
+  let r=await fetch(
+   "progetti/index.json?"+Date.now(),
+   {cache:"no-store"}
+  );
+
+  if(!r.ok)throw Error();
+
+  let a=await r.json();
+
+  if(!Array.isArray(a))throw Error();
+
+  s.innerHTML="";
+
+  if(!a.length){
+   s.innerHTML='<option value="">Nessun progetto</option>';
+   $("gitMsg").textContent="Nessun progetto su Git.";
+   return;
+  }
+
+  a.forEach(x=>{
+   let o=document.createElement("option");
+   o.value=x;
+   o.textContent=x.replace(/\.json$/i,"");
+   s.appendChild(o);
+  });
+
+  $("gitMsg").textContent="Progetti Git aggiornati.";
+
+ }catch(e){
+
+  s.innerHTML='<option value="">Git non raggiungibile</option>';
+  $("gitMsg").textContent=
+   "Git non raggiungibile: i progetti locali continuano a funzionare.";
+ }
+}
+
+async function caricaGit(){
+
+ let nome=$("progettiGit").value;
+
+ if(!nome){
+  alert("Nessun progetto selezionato.");
+  return;
+ }
+
+ try{
+
+  let r=await fetch(
+   "progetti/"+encodeURIComponent(nome)+"?"+Date.now(),
+   {cache:"no-store"}
+  );
+
+  if(!r.ok)throw Error();
+
+  applicaProgetto(await r.json());
+
+  $("gitMsg").textContent="Progetto caricato da Git.";
+
+ }catch(e){
+
+  $("gitMsg").textContent="Impossibile raggiungere o leggere Git.";
+  alert("Il progetto non è stato caricato.");
+ }
+}
+
+/* =========================================================
+   GITHUB SCRITTURA
+   ========================================================= */
+
+/*
+  Se il sito è:
+  https://utente.github.io/repository/
+  owner e repo vengono riconosciuti automaticamente.
+
+  Se usi un dominio personalizzato puoi compilare queste 2 righe.
+*/
+const GH_OWNER="";
+const GH_REPO="";
+const GH_BRANCH="";
+
+function ghInfo(){
+
+ if(GH_OWNER&&GH_REPO)
+  return {owner:GH_OWNER,repo:GH_REPO,branch:GH_BRANCH};
+
+ let h=location.hostname;
+
+ if(!h.endsWith(".github.io"))
+  throw Error("Repository GitHub non riconosciuto.");
+
+ let owner=h.split(".")[0];
+ let p=location.pathname.split("/").filter(Boolean);
+ let repo=p[0]||owner+".github.io";
+
+ return {owner,repo,branch:GH_BRANCH};
+}
+
+function b64(s){
+
+ let bytes=new TextEncoder().encode(s);
+ let bin="";
+ bytes.forEach(x=>bin+=String.fromCharCode(x));
+ return btoa(bin);
+}
+
+function fromB64(s){
+
+ s=s.replace(/\s/g,"");
+ let bin=atob(s);
+ let bytes=new Uint8Array(bin.length);
+
+ for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+
+ return new TextDecoder().decode(bytes);
+}
+
+async function ghGet(path,token){
+
+ let g=ghInfo();
+
+ let url=
+  "https://api.github.com/repos/"+
+  g.owner+"/"+g.repo+"/contents/"+path;
+
+ if(g.branch)url+="?ref="+encodeURIComponent(g.branch);
+
+ let r=await fetch(url,{
+  headers:{
+   Accept:"application/vnd.github+json",
+   Authorization:"Bearer "+token
+  }
+ });
+
+ if(r.status==404)return null;
+
+ if(!r.ok)throw Error("GitHub HTTP "+r.status);
+
+ return r.json();
+}
+
+async function ghPut(path,text,token,sha,message){
+
+ let g=ghInfo();
+
+ let url=
+  "https://api.github.com/repos/"+
+  g.owner+"/"+g.repo+"/contents/"+path;
+
+ let body={
+  message:message,
+  content:b64(text)
+ };
+
+ if(sha)body.sha=sha;
+ if(g.branch)body.branch=g.branch;
+
+ let r=await fetch(url,{
+  method:"PUT",
+  headers:{
+   Accept:"application/vnd.github+json",
+   "Content-Type":"application/json",
+   Authorization:"Bearer "+token,
+   "X-GitHub-Api-Version":"2026-03-10"
+  },
+  body:JSON.stringify(body)
+ });
+
+ if(!r.ok){
+  let x="";
+  try{x=(await r.json()).message||""}catch(e){}
+  throw Error("GitHub: "+(x||r.status));
+ }
+
+ return r.json();
+}
+
+async function salvaGit(){
+
+ try{
+
+  /* password del file Git */
+
+  let password=prompt("Password per salvare su Git:");
+
+  if(password===null)return;
+
+  let pr=await fetch(
+   "config/password.txt?"+Date.now(),
+   {cache:"no-store"}
+  );
+
+  if(!pr.ok)
+   throw Error("password.txt non raggiungibile.");
+
+  let corretta=(await pr.text()).trim();
+
+  if(password.trim()!==corretta){
+   alert("Password errata.");
+   return;
+  }
+
+  /* nome */
+
+  let p=creaProgetto();
+
+  if(!p.nome.trim()){
+   p.nome=prompt("Nome progetto:")||"Nuovo progetto";
+   $("nomeProgetto").value=p.nome;
+  }
+
+  let file=p.nome
+   .toLowerCase()
+   .normalize("NFD")
+   .replace(/[\u0300-\u036f]/g,"")
+   .replace(/[^a-z0-9]+/g,"-")
+   .replace(/^-|-$/g,"")+".json";
+
+  if(file==".json")file="progetto.json";
+
+  /* token GitHub */
+
+  let token=prompt(
+   "Token GitHub con permesso Contents: write:"
+  );
+
+  if(!token)return;
+
+  $("gitMsg").textContent="Salvataggio su Git...";
+
+  /* salva progetto */
+
+  let old=await ghGet("progetti/"+file,token);
+
+  await ghPut(
+   "progetti/"+file,
+   JSON.stringify(p,null,2),
+   token,
+   old&&old.sha,
+   "Salva progetto "+p.nome
+  );
+
+  /* aggiorna index */
+
+  let ix=await ghGet("progetti/index.json",token);
+  let elenco=[];
+
+  if(ix){
+   try{
+    elenco=JSON.parse(fromB64(ix.content));
+    if(!Array.isArray(elenco))elenco=[];
+   }catch(e){
+    elenco=[];
+   }
+  }
+
+  if(!elenco.includes(file))elenco.push(file);
+  elenco.sort();
+
+  await ghPut(
+   "progetti/index.json",
+   JSON.stringify(elenco,null,2),
+   token,
+   ix&&ix.sha,
+   "Aggiorna elenco progetti"
+  );
+
+  $("gitMsg").textContent=
+   "Salvato su Git: "+file;
+
+  /* aggiorna subito la lista locale */
+  await listaGit();
+
+ }catch(e){
+
+  console.error(e);
+
+  $("gitMsg").textContent=
+   "Salvataggio Git non riuscito.";
+
+  alert(
+   "Non è stato possibile salvare su Git.\n\n"+
+   e.message+
+   "\n\nLa macchina e il progetto locale non sono stati modificati."
+  );
+ }
+}
+
+/* ---------------- EVENTI ---------------- */
 
 $("stato").onchange=reset;
-
 $("statoS").onchange=reset;
-
 $("nastro").onchange=reset;
 
-
-/* AVVIO */
-
 genera();
-
 reset();
 
 </script>
