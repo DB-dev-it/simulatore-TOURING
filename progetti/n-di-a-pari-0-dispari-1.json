@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "stato": "0",
+  "alfabeto": [
+    "A",
+    "0",
+    "1",
+    "-",
+    "*"
+  ],
+  "stati": [
+    "0",
+    "1"
+  ],
+  "transizioni": {
+    "0|A": "A,1,d",
+    "0|-": "-,0,d",
+    "0|*": "0,fine,d",
+    "1|A": "A,0,d",
+    "1|-": "-,1,d",
+    "1|*": "1,fine,d"
+  },
+  "nastro": "AAA-",
+  "nome": "n di a pari 0 dispari 1"
+}
