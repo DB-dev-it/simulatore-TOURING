@@ -1,2136 +1,3251 @@
 <!doctype html>
 <html lang="it">
-
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Macchina di Turing</title>
 
-    <title>Macchina di Turing</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial;margin:10px;color:#111}
+h1{font-size:25px;margin:4px 0 8px}
+button,input,select,textarea{font:inherit}
+button{margin:2px;padding:5px 8px;cursor:pointer}
+input,select{max-width:100%}
+textarea{width:100%;height:150px;font-family:monospace}
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+.cfg{display:flex;flex-wrap:wrap;gap:7px;margin:7px 0}
+.cfg label{display:flex;flex-direction:column;font-size:12px}
+.cfg input{height:25px}
 
-        body {
-            font-family: Arial;
-            margin: 10px;
-            color: #111;
-        }
+.tab{overflow:auto;margin:7px 0}
+table{border-collapse:collapse}
+td,th{border:1px solid #999;padding:3px;text-align:center}
+th{background:#eee}
+td input{width:115px;border:0;text-align:center;font-family:monospace}
 
-        h1 {
-            font-size: 25px;
-            margin: 4px 0 8px;
-        }
+.err{color:#b00000;font-size:13px;white-space:pre-wrap}
+#gitMsg{font-size:12px;margin:5px 0}
 
-        button,
-        input,
-        textarea,
-        select {
-            font: inherit;
-        }
+#machine{
+ width:min(100%,620px);
+ background:#10e8e8;
+ padding:10px;
+ margin:10px 0;
+ text-align:center;
+ overflow:hidden
+}
 
-        button {
-            margin: 2px;
-            padding: 5px 8px;
-            cursor: pointer;
-        }
+#machineTop{
+ display:flex;
+ justify-content:center;
+ gap:25px;
+ flex-wrap:wrap
+}
 
-        input,
-        select {
-            max-width: 100%;
-        }
+#bubble{
+ display:inline-block;
+ background:white;
+ border:2px solid #111;
+ padding:2px 8px;
+ border-radius:20px;
+ margin-left:5px
+}
 
-        textarea {
-            width: 100%;
-            height: 150px;
-            font-family: monospace;
-        }
+.tapeBox{
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ gap:5px;
+ margin:12px auto 5px;
+ width:100%
+}
 
-        .row {
-            margin: 6px 0;
-        }
+.scroll{
+ width:30px;
+ height:35px;
+ padding:0;
+ margin:0;
+ flex:0 0 30px;
+ font-size:20px
+}
 
-        #school {
-            display: none;
-        }
+.tape{
+ display:flex;
+ justify-content:center;
+ overflow:hidden;
+ width:420px;
+ max-width:calc(100% - 70px)
+}
 
-        .cfg {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 7px;
-            margin: 7px 0;
-        }
+.cell{
+ flex:0 0 27px;
+ width:27px;
+ height:35px;
+ border:1px solid #999;
+ background:white;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-family:monospace
+}
 
-        .cfg label {
-            display: flex;
-            flex-direction: column;
-            font-size: 12px;
-        }
+.head{background:#ff38d8;font-weight:bold}
 
-        .cfg input {
-            height: 25px;
-        }
+#msg{
+ font-size:12px;
+ background:#ffffffaa;
+ padding:4px;
+ margin-top:5px
+}
 
-        .tab {
-            overflow: auto;
-            margin: 7px 0;
-        }
+#confronto{margin-top:15px;max-width:900px}
+.confrontoBox{
+ border:1px solid #999;
+ padding:10px;
+ margin-top:8px;
+ overflow:auto
+}
+#tabConfronto{width:100%;min-width:650px}
+#tabConfronto td,#tabConfronto th{padding:5px}
+.nomeConfronto{font-weight:bold;white-space:nowrap}
+.risultatoConfronto{font-family:monospace;white-space:pre}
+.confrontoAzioni{white-space:nowrap}
+#confrontoVuoto{color:#666;font-size:13px}
 
-        table {
-            border-collapse: collapse;
-        }
+.modal{
+ display:none;
+ position:fixed;
+ inset:0;
+ background:#0008;
+ align-items:center;
+ justify-content:center;
+ padding:15px;
+ z-index:100
+}
+.modal.open{display:flex}
 
-        td,
-        th {
-            border: 1px solid #999;
-            padding: 3px;
-            text-align: center;
-        }
+.box{
+ background:white;
+ padding:15px;
+ max-width:700px;
+ width:100%;
+ max-height:85vh;
+ overflow:auto
+}
 
-        th {
-            background: #eee;
-        }
+.box h2{margin-top:0}
+#listaProgetti{width:100%;height:180px}
 
-        td input {
-            width: 115px;
-            border: 0;
-            text-align: center;
-            font-family: monospace;
-        }
-
-        .err {
-            color: #b00000;
-            font-size: 13px;
-            white-space: pre-wrap;
-        }
-
-        #gitMsg {
-            font-size: 12px;
-            margin: 5px 0;
-        }
-
-        #machine {
-            width: min(100%, 620px);
-            background: #10e8e8;
-            padding: 10px;
-            margin: 10px 0;
-            text-align: center;
-            overflow: hidden;
-        }
-
-        #bubble {
-            display: inline-block;
-            background: white;
-            border: 2px solid #111;
-            padding: 2px 8px;
-            border-radius: 20px;
-            margin-left: 5px;
-        }
-
-        .tapeBox {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            margin: 12px auto 5px;
-            width: 100%;
-        }
-
-        .scroll {
-            width: 30px;
-            height: 35px;
-            padding: 0;
-            margin: 0;
-            flex: 0 0 30px;
-            font-size: 20px;
-        }
-
-        .tape {
-            display: flex;
-            justify-content: center;
-            overflow: hidden;
-            width: 420px;
-            max-width: calc(100% - 70px);
-        }
-
-        .cell {
-            flex: 0 0 27px;
-            width: 27px;
-            height: 35px;
-            border: 1px solid #999;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: monospace;
-        }
-
-        .head {
-            background: #ff38d8;
-            font-weight: bold;
-        }
-
-        #msg {
-            font-size: 12px;
-            background: #ffffffaa;
-            padding: 4px;
-            margin-top: 5px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #0008;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-        }
-
-        .modal.open {
-            display: flex;
-        }
-
-        .box {
-            background: white;
-            padding: 15px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 85vh;
-            overflow: auto;
-        }
-
-        .box h2 {
-            margin-top: 0;
-        }
-
-        #listaProgetti {
-            width: 100%;
-            height: 180px;
-        }
-
-        @media (max-width: 600px) {
-
-            body {
-                margin: 6px;
-            }
-
-            h1 {
-                font-size: 21px;
-            }
-
-            button {
-                font-size: 12px;
-                padding: 4px 6px;
-            }
-
-            textarea {
-                height: 125px;
-            }
-
-            #machine {
-                margin-left: 0;
-                width: 100%;
-                padding: 6px;
-            }
-
-            .tape {
-                width: 270px;
-            }
-
-            .cell {
-                flex-basis: 27px;
-                width: 27px;
-                height: 32px;
-            }
-
-            td input {
-                width: 100px;
-            }
-
-            .scroll {
-                width: 27px;
-                flex-basis: 27px;
-                height: 32px;
-            }
-        }
-    </style>
+@media(max-width:600px){
+ body{margin:6px}
+ h1{font-size:21px}
+ button{font-size:12px;padding:4px 6px}
+ textarea{height:125px}
+ #machine{margin-left:0;width:100%;padding:6px}
+ .tape{width:270px}
+ .cell{flex-basis:27px;width:27px;height:32px}
+ td input{width:100px}
+ .scroll{width:27px;flex-basis:27px;height:32px}
+}
+</style>
 </head>
 
 <body>
 
-    <h1>La macchina di Alan Turing</h1>
+<h1>La macchina di Turing</h1>
 
-    <div>
-        <button onclick="mode(0)">
-            NORMALE
-        </button>
+<div>
+ <button onclick="apriIstruzioni()">Istruzioni</button>
+ <button onclick="apriProgetti()">Progetti</button>
+</div>
 
-        <button onclick="mode(1)">
-            SCUOLA
-        </button>
+<div class="cfg">
 
-        <button onclick="apri()">
-            Istruzioni
-        </button>
-    </div>
+ <label>
+  Stato iniziale
+  <input id="statoS" value="0">
+ </label>
 
-    <div id="normal">
+ <label>
+  Alfabeto
+  <input id="alf" value="X,Y,*">
+ </label>
 
-        <div class="row">
-            Stato iniziale:
-            <input id="stato" value="0">
-        </div>
+ <label>
+  Stati
+  <input id="stati" value="0,1,2,3,4">
+ </label>
 
-        <div>
-            Programma:
-        </div>
+</div>
 
-        <textarea id="prog">(0,*)>(1,C,D)
-(1,*)>(2,I,D)
-(2,*)>(3,A,D)
-(3,*)>(fine,O,D)</textarea>
+<button onclick="genera()">Genera tabella</button>
+<button onclick="pulisciTabella()">Pulisci tabella</button>
 
-    </div>
+<div class="tab" id="tab"></div>
 
-    <div id="school">
+<div class="row">
+ Nastro iniziale:
+ <input id="nastro" value="">
+</div>
 
-        <div class="cfg">
+<div>
+ <button onclick="reset()">Ricomincia</button>
+ <button onclick="passo()">Esegui passo</button>
+ <button onclick="avvia()">Azione</button>
+ <button onclick="ferma()">Ferma</button>
+ <button onclick="aggiungiConfronto()">Aggiungi a confronto</button>
+</div>
 
-            <label>
-                Stato iniziale
-                <input id="statoS" value="0">
-            </label>
+<p id="err" class="err"></p>
 
-            <label>
-                Alfabeto
-                <input id="alf" value="X,Y,*">
-            </label>
+<div id="machine">
 
-            <label>
-                Azioni / stati
-                <input id="stati" value="0,1,2,3,4">
-            </label>
+ <div id="machineTop">
 
-        </div>
+  <div>
+   Turno:
+   <b id="turno">0</b>
+  </div>
 
-        <button onclick="genera()">
-            Genera tabella
-        </button>
+  <div>
+   Stato:
+   <b id="bubble">0</b>
+  </div>
 
-        <button onclick="apriProgetti()">
-            PROGETTI
-        </button>
+ </div>
 
-        <div class="tab" id="tab"></div>
+ <div class="tapeBox">
 
-    </div>
+  <button class="scroll" onclick="scrollTape(-4)">←</button>
 
-    <div class="row">
-        Nastro iniziale:
-        <input id="nastro" value="">
-    </div>
+  <div class="tape" id="tape"></div>
 
-    <div>
+  <button class="scroll" onclick="scrollTape(4)">→</button>
 
-        <button onclick="reset()">
-            Ricomincia
-        </button>
+ </div>
 
-        <button onclick="passo()">
-            Esegui passo
-        </button>
+ <div id="msg">Pronto</div>
 
-        <button onclick="avvia()">
-            Azione
-        </button>
+</div>
 
-        <button onclick="ferma()">
-            Ferma
-        </button>
+<div id="confronto">
 
-    </div>
+ <h2>Confronto</h2>
 
-    <p id="err" class="err"></p>
+ <div>
+  <label>
+   Nastro comune:
+   <input id="confrontoNastro" value="">
+  </label>
 
-    <div id="machine">
+  <button onclick="eseguiConfronto()">Esegui confronto</button>
+  <button onclick="svuotaConfronto()">Svuota</button>
+ </div>
 
-        <div>
-            Stato:
-            <b id="bubble">0</b>
-        </div>
+ <div class="confrontoBox">
 
-        <div class="tapeBox">
+  <div id="confrontoVuoto">
+   Nessuna macchina aggiunta al confronto.
+  </div>
 
-            <button
-                class="scroll"
-                onclick="scrollTape(-4)">
-                ←
-            </button>
+  <table id="tabConfronto" style="display:none">
 
-            <div
-                class="tape"
-                id="tape">
-            </div>
+   <thead>
+    <tr>
+     <th>Nome</th>
+     <th>Risultato</th>
+     <th>Passaggi</th>
+     <th>Istruzioni</th>
+     <th>Stati</th>
+     <th>Azioni</th>
+    </tr>
+   </thead>
 
-            <button
-                class="scroll"
-                onclick="scrollTape(4)">
-                →
-            </button>
+   <tbody id="corpoConfronto"></tbody>
 
-        </div>
+  </table>
 
-        <div id="msg">
-            Pronto
-        </div>
+ </div>
+</div>
 
-    </div>
+<div class="modal" id="progettiModal">
 
+ <div class="box">
 
-    <!-- PROGETTI -->
+  <button onclick="chiudiProgetti()" style="float:right">×</button>
 
-    <div
-        class="modal"
-        id="progettiModal">
+  <h2>Progetti</h2>
 
-        <div class="box">
+  <button onclick="listaGit()">Aggiorna Git</button>
+  <button onclick="caricaGit()">Carica da Git</button>
+  <button onclick="caricaComputer()">Carica da computer</button>
+  <button onclick="scaricaProgetto()">Scarica</button>
+  <button onclick="salvaGit()">Salva su Git</button>
+  <button onclick="dimenticaToken()">Dimentica token</button>
 
-            <button
-                onclick="chiudiProgetti()"
-                style="float:right">
-                ×
-            </button>
+  <p>Progetti su Git:</p>
 
-            <h2>
-                Progetti
-            </h2>
+  <select id="listaProgetti" size="7"></select>
 
-            <div>
+  <p id="gitMsg"></p>
 
-                <button onclick="listaGit()">
-                    Aggiorna Git
-                </button>
+  <input
+   id="fileInput"
+   type="file"
+   accept=".json,application/json"
+   style="display:none"
+   onchange="leggiFile(event)"
+  >
 
-                <button onclick="caricaGit()">
-                    Carica da Git
-                </button>
+ </div>
+</div>
 
-                <button onclick="caricaComputer()">
-                    Carica da computer
-                </button>
+<div class="modal" id="modal">
 
-                <button onclick="scaricaProgetto()">
-                    Scarica
-                </button>
+ <div class="box">
 
-                <button onclick="salvaGit()">
-                    Salva su Git
-                </button>
+  <button onclick="chiudiIstruzioni()" style="float:right">×</button>
 
-                <button onclick="dimenticaToken()">
-                    Dimentica token
-                </button>
+  <h2>Istruzioni</h2>
 
-            </div>
+  <ul>
+   <li>La macchina parte dal turno 0.</li>
+   <li>Ogni transizione aumenta il turno di 1.</li>
+   <li>Il turno comprende anche la transizione che porta a fine.</li>
+   <li>I simboli dell'alfabeto sono separati da virgola.</li>
+   <li><b>*</b> rappresenta la casella vuota.</li>
+   <li>Ogni cella contiene <code>lettera,stato,spostamento</code>.</li>
+   <li><b>S</b> = sinistra, <b>D</b> = destra.</li>
+   <li>La macchina si ferma se non trova una transizione.</li>
+   <li>Lo stato <b>fine</b> termina l'esecuzione.</li>
+   <li>Il confronto può contenere massimo 5 macchine.</li>
+  </ul>
 
-            <p>
-                Progetti su Git:
-            </p>
+ </div>
+</div>
 
-            <select
-                id="listaProgetti"
-                size="7">
-            </select>
+<script>
 
-            <p id="gitMsg"></p>
+/*
+=========================================================
+PARTE 2
+Tutto il JavaScript si trova nel messaggio successivo.
+=========================================================
+*/
 
-            <input
-                id="fileInput"
-                type="file"
-                accept=".json,application/json"
-                style="display:none"
-                onchange="leggiFile(event)">
+/* =========================================================
+   PARTE 2A
+   MACCHINA + TABELLA + NASTRO + CONFRONTO
+   ========================================================= */
 
-        </div>
-    </div>
+"use strict";
 
 
-    <!-- ISTRUZIONI -->
+/* =========================================================
+   VARIABILI PRINCIPALI
+   ========================================================= */
 
-    <div
-        class="modal"
-        id="modal">
+const MAX_CONFRONTO = 5;
+const LIMITE_PASSAGGI = 1000000;
 
-        <div class="box">
+let confronto = [];
 
-            <button
-                onclick="chiudi()"
-                style="float:right">
-                ×
-            </button>
+let macchina = {
+  stato: "0",
+  posizione: 0,
+  turno: 0,
+  nastro: {},
+  inEsecuzione: false,
+  timer: null
+};
 
-            <h2>
-                Istruzioni
-            </h2>
 
-            <ul>
+/* =========================================================
+   FUNZIONI UTILI
+   ========================================================= */
 
-                <li>
-                    NORMALE:
-                    <code>
-                        (stato,simbolo)&gt;(lettera,stato,spostamento)
-                    </code>
-                </li>
+function $(id){
+  return document.getElementById(id);
+}
 
-                <li>
-                    SCUOLA:
-                    <code>
-                        lettera,stato,spostamento
-                    </code>
-                </li>
 
-                <li>
-                    S = sinistra, D = destra.
-                </li>
+function escapeHtml(value){
 
-                <li>
-                    * = casella vuota.
-                </li>
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
 
-                <li>
-                    0 e fine sono sempre presenti.
-                </li>
 
-                <li>
-                    La macchina si ferma senza
-                    transizione compatibile.
-                </li>
+function splitLista(value){
 
-                <li>
-                    Raggiunto fine, la testina
-                    si sposta comunque.
-                </li>
+  return String(value || "")
+    .split(",")
+    .map(x => x.trim())
+    .filter(x => x !== "");
+}
 
-            </ul>
 
-        </div>
-    </div>
+function contaIstruzioniProgetto(progetto){
 
+  if(!progetto || !progetto.transizioni){
+    return 0;
+  }
 
-    <script>
+  return Object.keys(
+    progetto.transizioni
+  ).length;
+}
 
-        const $ = x =>
-            document.getElementById(x);
 
+/* =========================================================
+   PARSING DELLE TRANSIZIONI
+   ========================================================= */
 
-        let scuola = 0;
-        let rules = [];
-        let t = {};
-        let head = 0;
-        let state = "0";
-        let timer;
-        let view = 0;
+function analizzaTransizione(chiave,valore){
 
+  const partiChiave =
+    String(chiave)
+      .split("|");
 
-        /* =========================
-           MODALITÀ
-        ========================= */
+  if(partiChiave.length !== 2){
+    return null;
+  }
 
-        function mode(x) {
+  const partiValore =
+    String(valore || "")
+      .split(",")
+      .map(x => x.trim());
 
-            scuola = x;
+  if(partiValore.length !== 3){
+    return null;
+  }
 
-            $("normal").style.display =
-                x ? "none" : "block";
+  const q =
+    partiChiave[0].trim();
 
-            $("school").style.display =
-                x ? "block" : "none";
+  const r =
+    partiChiave[1].trim();
 
-            if (
-                x &&
-                !$("tab").innerHTML
-            ) {
-                genera();
-            }
+  const w =
+    partiValore[0];
 
-            reset();
+  const n =
+    partiValore[1];
 
-            if (x) {
-                listaGit();
-            }
+  const d =
+    partiValore[2].toUpperCase();
+
+  if(!q || !r || !n){
+    return null;
+  }
+
+  if(d !== "S" && d !== "D"){
+    return null;
+  }
+
+  return {
+    q:q,
+    r:r,
+    w:w,
+    n:n,
+    d:d
+  };
+}
+
+
+/* =========================================================
+   CONFIGURAZIONE CORRENTE
+   ========================================================= */
+
+function configurazioneCorrente(){
+
+  const transizioni = {};
+
+  const inputs =
+    $("tab").querySelectorAll(
+      "input[data-transition]"
+    );
+
+  inputs.forEach(input => {
+
+    const chiave =
+      input.dataset.transition;
+
+    transizioni[chiave] =
+      input.value.trim();
+
+  });
+
+
+  return {
+
+    nome:"",
+    stato:
+      $("statoS").value.trim() || "0",
+
+    alfabeto:
+      splitLista(
+        $("alf").value
+      ),
+
+    stati:
+      splitLista(
+        $("stati").value
+      ),
+
+    transizioni:
+      transizioni
+
+  };
+}
+
+
+/* =========================================================
+   APPLICA CONFIGURAZIONE
+   ========================================================= */
+
+function applicaConfigurazione(progetto){
+
+  if(!progetto){
+    return;
+  }
+
+
+  $("statoS").value =
+    progetto.stato ||
+    "0";
+
+
+  $("alf").value =
+    Array.isArray(progetto.alfabeto)
+      ? progetto.alfabeto.join(",")
+      : "X,Y,*";
+
+
+  $("stati").value =
+    Array.isArray(progetto.stati)
+      ? progetto.stati.join(",")
+      : "0,1,2,3,4";
+
+
+  genera();
+
+
+  const transizioni =
+    progetto.transizioni || {};
+
+
+  Object.keys(transizioni)
+    .forEach(chiave => {
+
+      const input =
+        $("tab").querySelector(
+          'input[data-transition="' +
+          cssEscape(chiave) +
+          '"]'
+        );
+
+      if(input){
+        input.value =
+          transizioni[chiave];
+      }
+
+    });
+
+
+  reset();
+
+}
+
+
+/* =========================================================
+   ESCAPE PER SELECTOR CSS
+   ========================================================= */
+
+function cssEscape(value){
+
+  if(
+    window.CSS &&
+    typeof window.CSS.escape === "function"
+  ){
+
+    return window.CSS.escape(
+      String(value)
+    );
+
+  }
+
+  return String(value)
+    .replace(
+      /([^\w-])/g,
+      "\\$1"
+    );
+}
+
+
+/* =========================================================
+   GENERAZIONE TABELLA
+   ========================================================= */
+
+function genera(){
+
+  ferma();
+
+
+  const stati =
+    splitLista(
+      $("stati").value
+    );
+
+
+  const alfabeto =
+    splitLista(
+      $("alf").value
+    );
+
+
+  if(!stati.length){
+
+    $("err").textContent =
+      "Inserisci almeno uno stato.";
+
+    $("tab").innerHTML =
+      "";
+
+    return;
+
+  }
+
+
+  if(!alfabeto.length){
+
+    $("err").textContent =
+      "Inserisci almeno un simbolo.";
+
+    $("tab").innerHTML =
+      "";
+
+    return;
+
+  }
+
+
+  $("err").textContent =
+    "";
+
+
+  const vecchi = {};
+
+
+  $("tab")
+    .querySelectorAll(
+      "input[data-transition]"
+    )
+    .forEach(input => {
+
+      vecchi[
+        input.dataset.transition
+      ] =
+        input.value;
+
+    });
+
+
+  let html =
+    "<table><thead><tr>";
+
+  html +=
+    "<th>Stato \\ Simbolo</th>";
+
+
+  alfabeto.forEach(simbolo => {
+
+    html +=
+      "<th>" +
+      escapeHtml(simbolo) +
+      "</th>";
+
+  });
+
+
+  html +=
+    "</tr></thead><tbody>";
+
+
+  stati.forEach(stato => {
+
+    html +=
+      "<tr>" +
+      "<th>" +
+      escapeHtml(stato) +
+      "</th>";
+
+
+    alfabeto.forEach(simbolo => {
+
+      const chiave =
+        stato +
+        "|" +
+        simbolo;
+
+
+      const valore =
+        Object.prototype.hasOwnProperty.call(
+          vecchi,
+          chiave
+        )
+          ? vecchi[chiave]
+          : "";
+
+
+      html +=
+        "<td>" +
+        "<input " +
+        "data-transition=\"" +
+        escapeHtml(chiave) +
+        "\" " +
+        "value=\"" +
+        escapeHtml(valore) +
+        "\" " +
+        "placeholder=\"X,1,D\">" +
+        "</td>";
+
+    });
+
+
+    html +=
+      "</tr>";
+
+  });
+
+
+  html +=
+    "</tbody></table>";
+
+
+  $("tab").innerHTML =
+    html;
+
+
+  reset();
+
+}
+
+function pulisciTabella(){
+
+  const inputs =
+    $("tab").querySelectorAll(
+      "input[data-transition]"
+    );
+
+  inputs.forEach(input => {
+    input.value = "";
+  });
+
+  $("err").textContent = "";
+
+  $("msg").textContent =
+    "Tabella pulita.";
+
+}
+/* =========================================================
+   LETTURA DELLE REGOLE
+   ========================================================= */
+
+function leggiRegole(){
+
+  const progetto =
+    configurazioneCorrente();
+
+
+  const regole = [];
+
+
+  Object.keys(
+    progetto.transizioni
+  ).forEach(chiave => {
+
+    const regola =
+      analizzaTransizione(
+        chiave,
+        progetto.transizioni[chiave]
+      );
+
+
+    if(regola){
+
+      regole.push(
+        regola
+      );
+
+    }
+
+  });
+
+
+  return regole;
+}
+
+
+/* =========================================================
+   TROVA REGOLA
+   ========================================================= */
+
+function trovaRegola(){
+
+  const simbolo =
+    Object.prototype.hasOwnProperty.call(
+      macchina.nastro,
+      macchina.posizione
+    )
+      ? macchina.nastro[
+          macchina.posizione
+        ]
+      : "";
+
+
+  const simboloRicerca =
+    simbolo === ""
+      ? "*"
+      : simbolo;
+
+
+  const regole =
+    leggiRegole();
+
+
+  return regole.find(
+    regola =>
+      regola.q === macchina.stato &&
+      regola.r === simboloRicerca
+  ) || null;
+}
+
+
+/* =========================================================
+   DISEGNO DEL NASTRO
+   ========================================================= */
+
+function disegnaNastro(){
+
+  const tape =
+    $("tape");
+
+
+  tape.innerHTML =
+    "";
+
+
+  const centro =
+    macchina.posizione;
+
+
+  const celle =
+    15;
+
+
+  const inizio =
+    centro -
+    Math.floor(celle / 2);
+
+
+  for(
+    let i=0;
+    i<celle;
+    i++
+  ){
+
+    const posizione =
+      inizio + i;
+
+
+    const cell =
+      document.createElement(
+        "div"
+      );
+
+
+    cell.className =
+      "cell";
+
+
+    /*
+     * IMPORTANTE:
+     *
+     * Una posizione mai utilizzata
+     * rimane visivamente bianca.
+     *
+     * Se invece la macchina ha scritto
+     * realmente "*" nella posizione,
+     * viene mostrato "*".
+     */
+
+    if(
+      Object.prototype.hasOwnProperty.call(
+        macchina.nastro,
+        posizione
+      )
+    ){
+
+      cell.textContent =
+        macchina.nastro[
+          posizione
+        ];
+
+    }else{
+
+      cell.textContent =
+        "";
+
+    }
+
+
+    if(
+      posizione ===
+      macchina.posizione
+    ){
+
+      cell.classList.add(
+        "head"
+      );
+
+    }
+
+
+    tape.appendChild(
+      cell
+    );
+
+  }
+
+
+  $("turno").textContent =
+    macchina.turno;
+
+
+  $("bubble").textContent =
+    macchina.stato;
+
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+function reset(){
+
+  ferma();
+
+
+  macchina.stato =
+    $("statoS").value.trim() ||
+    "0";
+
+
+  macchina.posizione =
+    0;
+
+
+  macchina.turno =
+    0;
+
+
+  macchina.nastro =
+    {};
+
+
+  const iniziale =
+    $("nastro").value;
+
+
+  /*
+   * Il nastro iniziale è composto
+   * esattamente dai caratteri inseriti.
+   *
+   * Una stringa vuota significa
+   * casella bianca.
+   */
+
+  [...String(iniziale)]
+    .forEach(
+      (simbolo,indice) => {
+
+        macchina.nastro[
+          indice
+        ] =
+          simbolo;
+
+      }
+    );
+
+
+  macchina.inEsecuzione =
+    false;
+
+
+  $("msg").textContent =
+    "Pronto";
+
+
+  $("err").textContent =
+    "";
+
+
+  disegnaNastro();
+
+}
+
+
+/* =========================================================
+   ESEGUI UN PASSO
+   ========================================================= */
+
+function passo(){
+
+  if(
+    macchina.turno >=
+    LIMITE_PASSAGGI
+  ){
+
+    $("msg").textContent =
+      "Raggiunto il limite di sicurezza.";
+
+    ferma();
+
+    return;
+
+  }
+
+
+  const regola =
+    trovaRegola();
+
+
+  if(!regola){
+
+    $("msg").textContent =
+      "Macchina ferma: nessuna transizione.";
+
+    ferma();
+
+    return;
+
+  }
+
+
+  /*
+   * Scrittura.
+   */
+
+  macchina.nastro[
+    macchina.posizione
+  ] =
+    regola.w;
+
+
+  /*
+   * Cambio stato.
+   */
+
+  macchina.stato =
+    regola.n;
+
+
+  /*
+   * Movimento.
+   */
+
+  if(regola.d === "D"){
+
+    macchina.posizione++;
+
+  }else{
+
+    macchina.posizione--;
+
+  }
+
+
+  /*
+   * Il turno aumenta anche
+   * quando si entra in FINE.
+   */
+
+  macchina.turno++;
+
+
+  disegnaNastro();
+
+
+  if(
+    macchina.stato.toLowerCase() ===
+    "fine"
+  ){
+
+    $("msg").textContent =
+      "Fine. Passaggi: " +
+      macchina.turno;
+
+    ferma();
+
+    return;
+
+  }
+
+
+  $("msg").textContent =
+    "Passaggio " +
+    macchina.turno;
+
+}
+
+
+/* =========================================================
+   AVVIA ESECUZIONE AUTOMATICA
+   ========================================================= */
+
+function avvia(){
+
+  if(macchina.inEsecuzione){
+
+    return;
+
+  }
+
+
+  macchina.inEsecuzione =
+    true;
+
+
+  $("msg").textContent =
+    "Macchina in esecuzione...";
+
+
+  macchina.timer =
+    setInterval(
+      () => {
+
+        if(
+          !macchina.inEsecuzione
+        ){
+
+          return;
+
         }
 
 
-        /* =========================
-           MODAL
-        ========================= */
+        passo();
 
-        function apri() {
+      },
+      300
+    );
 
-            $("modal")
-                .classList
-                .add("open");
+}
+
+
+/* =========================================================
+   FERMA
+   ========================================================= */
+
+function ferma(){
+
+  macchina.inEsecuzione =
+    false;
+
+
+  if(
+    macchina.timer !== null
+  ){
+
+    clearInterval(
+      macchina.timer
+    );
+
+    macchina.timer =
+      null;
+
+  }
+
+}
+
+
+/* =========================================================
+   SCORRIMENTO VISIVO DEL NASTRO
+   ========================================================= */
+
+function scrollTape(delta){
+
+  macchina.posizione +=
+    Number(delta) || 0;
+
+
+  disegnaNastro();
+
+}
+
+
+/* =========================================================
+   MODALI
+   ========================================================= */
+
+function apriIstruzioni(){
+
+  $("modal")
+    .classList
+    .add("open");
+
+}
+
+
+function chiudiIstruzioni(){
+
+  $("modal")
+    .classList
+    .remove("open");
+
+}
+
+
+function apriProgetti(){
+
+  $("progettiModal")
+    .classList
+    .add("open");
+
+}
+
+
+function chiudiProgetti(){
+
+  $("progettiModal")
+    .classList
+    .remove("open");
+
+}
+
+
+/* =========================================================
+   CONFRONTO
+   ========================================================= */
+
+function aggiungiConfronto(){
+
+  if(
+    confronto.length >=
+    MAX_CONFRONTO
+  ){
+
+    alert(
+      "Puoi aggiungere al massimo " +
+      MAX_CONFRONTO +
+      " macchine."
+    );
+
+    return;
+
+  }
+
+
+  const progetto =
+    configurazioneCorrente();
+
+
+  const nomeSuggerito =
+    "Macchina " +
+    (confronto.length + 1);
+
+
+  let nome =
+    prompt(
+      "Nome della macchina:",
+      nomeSuggerito
+    );
+
+
+  if(nome === null){
+
+    return;
+
+  }
+
+
+  nome =
+    nome.trim();
+
+
+  if(!nome){
+
+    nome =
+      nomeSuggerito;
+
+  }
+
+
+  confronto.push({
+
+    nome:
+      nome,
+
+    progetto:
+      JSON.parse(
+        JSON.stringify(
+          progetto
+        )
+      ),
+
+    risultato:
+      "",
+
+    passaggi:
+      0,
+
+    statoFinale:
+      "",
+
+    motivo:
+      ""
+
+  });
+
+
+  renderConfronto();
+
+
+  $("msg").textContent =
+    '"' +
+    nome +
+    '" aggiunta al confronto.';
+
+}
+
+
+/* =========================================================
+   RENDER CONFRONTO
+   ========================================================= */
+
+function renderConfronto(){
+
+  const corpo =
+    $("corpoConfronto");
+
+
+  corpo.innerHTML =
+    "";
+
+
+  if(
+    confronto.length === 0
+  ){
+
+    $("confrontoVuoto")
+      .style.display =
+      "block";
+
+
+    $("tabConfronto")
+      .style.display =
+      "none";
+
+
+    return;
+
+  }
+
+
+  $("confrontoVuoto")
+    .style.display =
+    "none";
+
+
+  $("tabConfronto")
+    .style.display =
+    "table";
+
+
+  confronto.forEach(
+    (item,indice) => {
+
+      const progetto =
+        item.progetto ||
+        {};
+
+
+      const istruzioni =
+        contaIstruzioniProgetto(
+          progetto
+        );
+
+
+      const stati =
+        Array.isArray(
+          progetto.stati
+        )
+          ? progetto.stati.length
+          : 0;
+
+
+      const tr =
+        document.createElement(
+          "tr"
+        );
+
+
+      tr.innerHTML =
+
+        "<td class=\"nomeConfronto\">" +
+        escapeHtml(
+          item.nome
+        ) +
+        "</td>" +
+
+        "<td class=\"risultatoConfronto\">" +
+        escapeHtml(
+          item.risultato || "—"
+        ) +
+        "</td>" +
+
+        "<td>" +
+        escapeHtml(
+          item.passaggi
+        ) +
+        "</td>" +
+
+        "<td>" +
+        escapeHtml(
+          istruzioni
+        ) +
+        "</td>" +
+
+        "<td>" +
+        escapeHtml(
+          stati
+        ) +
+        "</td>" +
+
+        "<td class=\"confrontoAzioni\">" +
+
+        "<button onclick=\"modificaConfronto(" +
+        indice +
+        ")\">Modifica</button>" +
+
+        "<button onclick=\"eliminaConfronto(" +
+        indice +
+        ")\">Elimina</button>" +
+
+        "</td>";
+
+
+      corpo.appendChild(
+        tr
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   MODIFICA DAL CONFRONTO
+   ========================================================= */
+
+function modificaConfronto(indice){
+
+  const item =
+    confronto[indice];
+
+
+  if(!item){
+    return;
+  }
+
+
+  /*
+   * UN SOLO MESSAGGIO.
+   */
+
+  const ok =
+    confirm(
+      'La voce "' +
+      item.nome +
+      '" verrà eliminata dal confronto.\n\n' +
+
+      "Ciò che è scritto nella tabella " +
+      "principale verrà cancellato e " +
+      "sostituito con il codice di questa macchina.\n\n" +
+
+      "Vuoi continuare?"
+    );
+
+
+  if(!ok){
+    return;
+  }
+
+
+  /*
+   * Salviamo una copia prima
+   * di eliminare la voce.
+   */
+
+  const progetto =
+    JSON.parse(
+      JSON.stringify(
+        item.progetto
+      )
+    );
+
+
+  /*
+   * La macchina viene realmente
+   * tolta dal confronto.
+   */
+
+  confronto.splice(
+    indice,
+    1
+  );
+
+
+  /*
+   * Il codice della macchina
+   * viene riportato nella griglia.
+   */
+
+  applicaConfigurazione(
+    progetto
+  );
+
+
+  renderConfronto();
+
+
+  $("msg").textContent =
+    'La macchina "' +
+    item.nome +
+    '" è stata riportata nella griglia.';
+
+}
+
+
+/* =========================================================
+   ELIMINA DAL CONFRONTO
+   ========================================================= */
+
+function eliminaConfronto(indice){
+
+  const item =
+    confronto[indice];
+
+
+  if(!item){
+    return;
+  }
+
+
+  if(
+    !confirm(
+      'Vuoi eliminare "' +
+      item.nome +
+      '" dal confronto?'
+    )
+  ){
+
+    return;
+
+  }
+
+
+  confronto.splice(
+    indice,
+    1
+  );
+
+
+  renderConfronto();
+
+
+  $("msg").textContent =
+    'La macchina "' +
+    item.nome +
+    '" è stata eliminata.';
+
+}
+
+
+/* =========================================================
+   SVUOTA CONFRONTO
+   ========================================================= */
+
+function svuotaConfronto(){
+
+  if(
+    confronto.length === 0
+  ){
+
+    return;
+
+  }
+
+
+  if(
+    !confirm(
+      "Vuoi eliminare tutte le macchine dal confronto?"
+    )
+  ){
+
+    return;
+
+  }
+
+
+  confronto =
+    [];
+
+
+  renderConfronto();
+
+
+  $("msg").textContent =
+    "Confronto svuotato.";
+
+}
+
+
+/* =========================================================
+   ESECUZIONE DI UNA MACCHINA DEL CONFRONTO
+   ========================================================= */
+
+function eseguiMacchina(
+  progetto,
+  nastroIniziale
+){
+
+  const transizioni =
+    progetto.transizioni ||
+    {};
+
+
+  const regole =
+    [];
+
+
+  Object.keys(
+    transizioni
+  ).forEach(chiave => {
+
+    const regola =
+      analizzaTransizione(
+        chiave,
+        transizioni[chiave]
+      );
+
+
+    if(regola){
+
+      regole.push(
+        regola
+      );
+
+    }
+
+  });
+
+
+  const tape =
+    {};
+
+
+  [...String(
+    nastroIniziale || ""
+  )].forEach(
+    (simbolo,indice) => {
+
+      tape[indice] =
+        simbolo;
+
+    }
+  );
+
+
+  let stato =
+    String(
+      progetto.stato ||
+      "0"
+    );
+
+
+  let posizione =
+    0;
+
+
+  let passaggi =
+    0;
+
+
+  let motivo =
+    "";
+
+
+  let terminata =
+    false;
+
+
+  while(
+    passaggi <
+    LIMITE_PASSAGGI
+  ){
+
+    const simbolo =
+      Object.prototype.hasOwnProperty.call(
+        tape,
+        posizione
+      )
+        ? tape[posizione]
+        : "";
+
+
+    const simboloRicerca =
+      simbolo === ""
+        ? "*"
+        : simbolo;
+
+
+    const regola =
+      regole.find(
+        r =>
+          r.q === stato &&
+          r.r === simboloRicerca
+      );
+
+
+    if(!regola){
+
+      terminata =
+        true;
+
+      motivo =
+        "nessuna transizione";
+
+      break;
+
+    }
+
+
+    tape[posizione] =
+      regola.w;
+
+
+    stato =
+      regola.n;
+
+
+    if(regola.d === "D"){
+
+      posizione++;
+
+    }else{
+
+      posizione--;
+
+    }
+
+
+    passaggi++;
+
+
+    if(
+      stato.toLowerCase() ===
+      "fine"
+    ){
+
+      terminata =
+        true;
+
+      motivo =
+        "fine";
+
+      break;
+
+    }
+
+  }
+
+
+  if(!terminata){
+
+    motivo =
+      "limite di " +
+      LIMITE_PASSAGGI +
+      " passaggi";
+
+  }
+
+
+  const posizioni =
+    Object.keys(tape)
+      .map(
+        Number
+      );
+
+
+  posizioni.push(0);
+  posizioni.push(posizione);
+
+
+  const min =
+    Math.min(
+      ...posizioni
+    );
+
+
+  const max =
+    Math.max(
+      ...posizioni
+    );
+
+
+  let risultato =
+    "";
+
+
+  for(
+    let p=min;
+    p<=max;
+    p++
+  ){
+
+    if(
+      Object.prototype.hasOwnProperty.call(
+        tape,
+        p
+      )
+    ){
+
+      risultato +=
+        tape[p];
+
+    }else{
+
+      /*
+       * Casella mai utilizzata:
+       * rimane bianca.
+       */
+
+      risultato +=
+        "";
+
+    }
+
+  }
+
+
+  return {
+
+    risultato:
+      risultato,
+
+    passaggi:
+      passaggi,
+
+    statoFinale:
+      stato,
+
+    posizioneFinale:
+      posizione,
+
+    terminata:
+      terminata,
+
+    motivo:
+      motivo
+
+  };
+
+}
+
+
+/* =========================================================
+   ESEGUI CONFRONTO
+   ========================================================= */
+
+function eseguiConfronto(){
+
+  if(
+    confronto.length === 0
+  ){
+
+    alert(
+      "Non ci sono macchine nel confronto."
+    );
+
+    return;
+
+  }
+
+
+  const nastro =
+    $("confrontoNastro").value;
+
+
+  confronto.forEach(item => {
+
+    try{
+
+      const risultato =
+        eseguiMacchina(
+          item.progetto,
+          nastro
+        );
+
+
+      item.risultato =
+        risultato.risultato;
+
+
+      item.passaggi =
+        risultato.passaggi;
+
+
+      item.statoFinale =
+        risultato.statoFinale;
+
+
+      item.motivo =
+        risultato.motivo;
+
+
+    }catch(e){
+
+      item.risultato =
+        "ERRORE";
+
+
+      item.passaggi =
+        0;
+
+
+      item.statoFinale =
+        "";
+
+
+      item.motivo =
+        e.message ||
+        String(e);
+
+    }
+
+  });
+
+
+  renderConfronto();
+
+}
+/* =========================================================
+   PARTE 2B
+   PROGETTI + GITHUB + INIZIALIZZAZIONE
+   ========================================================= */
+
+
+/* =========================================================
+   CREAZIONE PROGETTO
+   ========================================================= */
+
+function creaProgetto(){
+
+  return configurazioneCorrente();
+
+}
+
+
+/* =========================================================
+   SCARICA PROGETTO
+   ========================================================= */
+
+function scaricaProgetto(){
+
+  try{
+
+    let nome =
+      prompt(
+        "Nome del progetto:",
+        "progetto"
+      );
+
+
+    if(nome === null){
+
+      return;
+
+    }
+
+
+    nome =
+      nome.trim();
+
+
+    if(!nome){
+
+      nome =
+        "progetto";
+
+    }
+
+
+    const progetto =
+      creaProgetto();
+
+
+    progetto.nome =
+      nome;
+
+
+    let file =
+      nome
+        .replace(
+          /[\\/:*?"<>|]+/g,
+          "_"
+        );
+
+
+    if(!file){
+
+      file =
+        "progetto";
+
+    }
+
+
+    file +=
+      ".json";
+
+
+    const blob =
+      new Blob(
+        [
+          JSON.stringify(
+            progetto,
+            null,
+            2
+          )
+        ],
+        {
+          type:
+            "application/json"
+        }
+      );
+
+
+    const url =
+      URL.createObjectURL(
+        blob
+      );
+
+
+    const a =
+      document.createElement(
+        "a"
+      );
+
+
+    a.href =
+      url;
+
+
+    a.download =
+      file;
+
+
+    document.body.appendChild(
+      a
+    );
+
+
+    a.click();
+
+
+    a.remove();
+
+
+    setTimeout(
+      () => {
+
+        URL.revokeObjectURL(
+          url
+        );
+
+      },
+      1000
+    );
+
+
+    $("gitMsg").textContent =
+      "Progetto scaricato.";
+
+  }catch(e){
+
+    console.error(e);
+
+    alert(
+      "Impossibile scaricare il progetto.\n\n" +
+      (
+        e.message ||
+        String(e)
+      )
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CARICA DA COMPUTER
+   ========================================================= */
+
+function caricaComputer(){
+
+  $("fileInput").click();
+
+}
+
+
+function leggiFile(event){
+
+  const file =
+    event.target.files[0];
+
+
+  if(!file){
+
+    return;
+
+  }
+
+
+  const reader =
+    new FileReader();
+
+
+  reader.onload =
+    function(){
+
+      try{
+
+        const progetto =
+          JSON.parse(
+            reader.result
+          );
+
+
+        /*
+         * Controllo minimo per evitare
+         * di caricare file completamente
+         * estranei.
+         */
+
+        if(
+          !progetto ||
+          typeof progetto !== "object"
+        ){
+
+          throw Error(
+            "Il file non contiene un progetto valido."
+          );
+
         }
 
 
-        function chiudi() {
+        applicaConfigurazione(
+          progetto
+        );
 
-            $("modal")
-                .classList
-                .remove("open");
-        }
 
+        $("gitMsg").textContent =
+          "Progetto caricato dal computer.";
 
-        function apriProgetti() {
 
-            if (!scuola) {
-                return;
-            }
+        $("msg").textContent =
+          "Progetto caricato.";
 
-            $("progettiModal")
-                .classList
-                .add("open");
+      }catch(e){
 
-            listaGit();
-        }
+        alert(
+          "File progetto non valido.\n\n" +
+          (
+            e.message ||
+            String(e)
+          )
+        );
 
+      }
 
-        function chiudiProgetti() {
 
-            $("progettiModal")
-                .classList
-                .remove("open");
-        }
+      /*
+       * Permette di selezionare
+       * nuovamente lo stesso file.
+       */
 
+      event.target.value =
+        "";
 
-        /* =========================
-           TABELLA
-        ========================= */
+    };
 
-        function genera() {
 
-            let A =
-                $("alf")
-                    .value
-                    .split(",")
-                    .map(x => x.trim())
-                    .filter(Boolean);
+  reader.onerror =
+    function(){
 
+      alert(
+        "Impossibile leggere il file."
+      );
 
-            let S =
-                $("stati")
-                    .value
-                    .split(",")
-                    .map(x => x.trim())
-                    .filter(Boolean);
 
+      event.target.value =
+        "";
 
-            A = [...new Set(A)];
+    };
 
 
-            if (!A.includes("*")) {
-                A.push("*");
-            }
+  reader.readAsText(
+    file
+  );
 
+}
 
-            S = [
-                ...new Set(
-                    S.filter(
-                        x =>
-                            x &&
-                            x != "0" &&
-                            x.toLowerCase() != "fine"
-                    )
-                )
-            ];
 
+/* =========================================================
+   INFORMAZIONI REPOSITORY GITHUB
+   ========================================================= */
 
-            S = [
-                "0",
-                ...S,
-                "fine"
-            ];
+function ghInfo(){
 
+  const hostname =
+    location.hostname;
 
-            let old = {};
 
+  if(
+    !hostname.endsWith(
+      ".github.io"
+    )
+  ){
 
-            document
-                .querySelectorAll("#tab input")
-                .forEach(x => {
+    throw Error(
+      "Questa pagina non sembra essere ospitata su GitHub Pages."
+    );
 
-                    old[x.dataset.k] =
-                        x.value;
-                });
+  }
 
 
-            let h =
-                "<table>" +
-                "<tr>" +
-                "<th>Stato \\ A</th>";
+  const owner =
+    hostname.split(".")[0];
 
 
-            A.forEach(a => {
+  const parti =
+    location.pathname
+      .split("/")
+      .filter(
+        x => x
+      );
 
-                h +=
-                    "<th>" +
-                    a +
-                    "</th>";
-            });
 
+  return {
 
-            h += "</tr>";
+    owner:
+      owner,
 
+    repo:
+      parti.length
+        ? parti[0]
+        : owner + ".github.io"
 
-            S.forEach(s => {
+  };
 
-                h +=
-                    "<tr>" +
-                    "<th>" +
-                    s +
-                    "</th>";
+}
 
 
-                A.forEach(a => {
+/* =========================================================
+   BASE64
+   ========================================================= */
 
-                    let k =
-                        s + "|" + a;
+function b64(testo){
 
+  const bytes =
+    new TextEncoder()
+      .encode(
+        testo
+      );
 
-                    h +=
-                        `<td>
-                            <input
-                                data-k="${k}"
-                                value="${old[k] || ""}"
-                                placeholder="lettera,stato,D">
-                        </td>`;
-                });
 
+  let binario =
+    "";
 
-                h += "</tr>";
-            });
 
+  for(
+    const byte of bytes
+  ){
 
-            $("tab").innerHTML =
-                h +
-                "</table>";
-        }
+    binario +=
+      String.fromCharCode(
+        byte
+      );
 
+  }
 
-        /* =========================
-           LETTURA
-        ========================= */
 
-        function leggi() {
+  return btoa(
+    binario
+  );
 
-            if (!scuola) {
+}
 
-                return $("prog")
-                    .value
-                    .split("\n")
-                    .map((x, i) => {
 
-                        x = x.trim();
+function fromB64(testo){
 
-                        if (!x) {
-                            return null;
-                        }
+  const binario =
+    atob(
+      String(testo)
+        .replace(
+          /\s/g,
+          ""
+        )
+    );
 
 
-                        let m =
-                            x.match(
-                                /^\((.*?),(.*?)\)\s*>\s*\((.*?),(.*?),([SD])\)$/i
-                            );
+  const bytes =
+    new Uint8Array(
+      binario.length
+    );
 
 
-                        if (!m) {
+  for(
+    let i=0;
+    i<binario.length;
+    i++
+  ){
 
-                            throw Error(
-                                "Riga " +
-                                (i + 1) +
-                                " non valida."
-                            );
-                        }
+    bytes[i] =
+      binario.charCodeAt(i);
 
+  }
 
-                        return {
 
-                            q: m[1].trim(),
+  return new TextDecoder()
+    .decode(
+      bytes
+    );
 
-                            r: m[2].trim(),
+}
 
-                            w: m[4].trim(),
 
-                            n: m[3].trim(),
+/* =========================================================
+   TOKEN GITHUB
+   ========================================================= */
 
-                            d:
-                                m[5]
-                                    .toUpperCase()
-                        };
+const TOKEN_KEY =
+  "simulatore_turing_github_token";
 
-                    })
-                    .filter(Boolean);
-            }
 
+function tokenGit(){
 
-            let a = [];
+  let token =
+    localStorage.getItem(
+      TOKEN_KEY
+    );
 
 
-            let heads =
-                [
-                    ...document
-                        .querySelectorAll(
-                            "#tab th"
-                        )
-                ]
-                .map(x =>
-                    x.textContent
-                );
+  if(token){
 
+    return token.trim();
 
-            document
-                .querySelectorAll("#tab tr")
-                .forEach((tr, i) => {
+  }
 
-                    if (!i) {
-                        return;
-                    }
 
+  token =
+    prompt(
+      "Inserisci il token GitHub:"
+    );
 
-                    let q =
-                        tr.cells[0]
-                            .textContent;
 
+  if(token === null){
 
-                    [
-                        ...tr
-                            .querySelectorAll(
-                                "input"
-                            )
-                    ]
-                    .forEach((x, j) => {
+    return "";
 
-                        if (
-                            !x.value.trim()
-                        ) {
-                            return;
-                        }
+  }
 
 
-                        let p =
-                            x.value
-                                .split(",")
-                                .map(
-                                    y =>
-                                        y.trim()
-                                );
+  token =
+    token.trim();
 
 
-                        if (p.length != 3) {
+  if(!token){
 
-                            throw Error(
-                                "Cella (" +
-                                q +
-                                "," +
-                                heads[j + 1] +
-                                ") non valida."
-                            );
-                        }
+    alert(
+      "Token non inserito."
+    );
 
 
-                        if (
-                            p[0].length != 1
-                        ) {
+    return "";
 
-                            throw Error(
-                                "La lettera deve avere un carattere."
-                            );
-                        }
+  }
 
 
-                        if (
-                            !/^[SD]$/i.test(
-                                p[2]
-                            )
-                        ) {
+  localStorage.setItem(
+    TOKEN_KEY,
+    token
+  );
 
-                            throw Error(
-                                "Lo spostamento deve essere S oppure D."
-                            );
-                        }
 
+  return token;
 
-                        a.push({
+}
 
-                            q: q,
 
-                            r:
-                                heads[j + 1],
+function dimenticaToken(){
 
-                            w: p[0],
+  localStorage.removeItem(
+    TOKEN_KEY
+  );
 
-                            n: p[1],
 
-                            d:
-                                p[2]
-                                    .toUpperCase()
-                        });
+  $("gitMsg").textContent =
+    "Token eliminato dal browser.";
 
-                    });
 
-                });
+  alert(
+    "Token eliminato.\n\n" +
+    "Al prossimo salvataggio verrà " +
+    "richiesto nuovamente."
+  );
 
+}
 
-            return a;
-        }
 
+/* =========================================================
+   GITHUB GET
+   ========================================================= */
 
-        /* =========================
-           MACCHINA
-        ========================= */
+async function ghGet(
+  path,
+  token
+){
 
-        function reset() {
+  const g =
+    ghInfo();
 
-            ferma();
 
-            t = {};
-            head = 0;
-            view = 0;
+  const url =
+    "https://api.github.com/repos/" +
+    encodeURIComponent(g.owner) +
+    "/" +
+    encodeURIComponent(g.repo) +
+    "/contents/" +
+    path;
 
 
-            state = (
-                scuola
-                    ? $("statoS")
-                    : $("stato")
-            )
-                .value
-                .trim() || "0";
+  const response =
+    await fetch(
+      url,
+      {
+        headers:{
 
+          Accept:
+            "application/vnd.github+json",
 
-            [
-                ...$("nastro").value
-            ].forEach((x, i) => {
-
-                t[i] = x;
-            });
-
-
-            try {
-
-                rules = leggi();
-
-                $("err").textContent =
-                    "";
-
-                $("msg").textContent =
-                    "Pronto";
-
-            } catch (e) {
-
-                rules = [];
-
-                $("err").textContent =
-                    e.message;
-
-                $("msg").textContent =
-                    "Errore nel programma";
-            }
-
-
-            render();
-        }
-
-
-        function sym() {
-
-            return t[head] === undefined
-                ? "*"
-                : t[head];
-        }
-
-
-        function passo() {
-
-            try {
-
-                rules = leggi();
-
-                $("err").textContent =
-                    "";
-
-            } catch (e) {
-
-                $("err").textContent =
-                    e.message;
-
-                return false;
-            }
-
-
-            let r =
-                rules.find(
-                    x =>
-                        x.q == state &&
-                        (
-                            x.r == sym() ||
-                            (
-                                x.r == "*" &&
-                                sym() == "*"
-                            )
-                        )
-                );
-
-
-            if (!r) {
-
-                $("msg").textContent =
-                    'Fermata: nessuna transizione per stato "' +
-                    state +
-                    '" e simbolo "' +
-                    sym() +
-                    '".';
-
-                ferma();
-
-                return false;
-            }
-
-
-            t[head] = r.w;
-
-            state = r.n;
-
-            head +=
-                r.d == "D"
-                    ? 1
-                    : -1;
-
-
-            $("bubble").textContent =
-                state;
-
-
-            render();
-
-
-            if (
-                state.toLowerCase() ==
-                "fine"
-            ) {
-
-                $("msg").textContent =
-                    "Fermata: raggiunto lo stato FINE.";
-
-                ferma();
-
-                return false;
-            }
-
-
-            $("msg").textContent =
-                "Passo eseguito — scrivo " +
-                r.w +
-                ", stato " +
-                state +
-                ".";
-
-
-            return true;
-        }
-
-
-        function avvia() {
-
-            reset();
-
-            let n = 0;
-
-
-            timer =
-                setInterval(() => {
-
-                    if (++n > 10000) {
-
-                        $("msg").textContent =
-                            "Fermata: limite di 10000 passi.";
-
-                        ferma();
-
-                        return;
-                    }
-
-
-                    if (!passo()) {
-                        ferma();
-                    }
-
-                }, 200);
-        }
-
-
-        function ferma() {
-
-            clearInterval(timer);
-
-            timer = null;
-        }
-
-
-        function scrollTape(n) {
-
-            view += n;
-
-            render();
-        }
-
-
-        function render() {
-
-            $("bubble").textContent =
-                state;
-
-
-            let h = "";
-
-            let c =
-                head + view;
-
-
-            for (
-                let p = c - 7;
-                p <= c + 7;
-                p++
-            ) {
-
-                h +=
-                    `<div class="cell ${p == head ? "head" : ""}">
-                        ${t[p] === undefined ? "" : t[p]}
-                    </div>`;
-            }
-
-
-            $("tape").innerHTML =
-                h;
-        }
-
-
-        /* =========================
-           PROGETTI
-        ========================= */
-
-        function creaProgetto() {
-
-            let trans = {};
-
-
-            document
-                .querySelectorAll(
-                    "#tab input"
-                )
-                .forEach(x => {
-
-                    if (
-                        x.value.trim()
-                    ) {
-
-                        trans[x.dataset.k] =
-                            x.value.trim();
-                    }
-                });
-
-
-            return {
-
-                version: 1,
-
-                stato:
-                    $("statoS")
-                        .value
-                        .trim() || "0",
-
-                alfabeto:
-                    $("alf")
-                        .value
-                        .split(",")
-                        .map(x => x.trim())
-                        .filter(Boolean),
-
-                stati:
-                    $("stati")
-                        .value
-                        .split(",")
-                        .map(x => x.trim())
-                        .filter(Boolean),
-
-                transizioni:
-                    trans,
-
-                nastro:
-                    $("nastro").value
-            };
-        }
-
-
-        function applicaProgetto(p) {
-
-            if (
-                !p ||
-                typeof p != "object"
-            ) {
-                throw Error();
-            }
-
-
-            $("statoS").value =
-                p.stato || "0";
-
-
-            $("alf").value =
-                Array.isArray(p.alfabeto)
-                    ? p.alfabeto.join(",")
-                    : "X,Y,*";
-
-
-            $("stati").value =
-                Array.isArray(p.stati)
-                    ? p.stati.join(",")
-                    : "0,1,2,3,4";
-
-
-            $("nastro").value =
-                typeof p.nastro == "string"
-                    ? p.nastro
-                    : "";
-
-
-            genera();
-
-
-            let tr =
-                p.transizioni || {};
-
-
-            document
-                .querySelectorAll(
-                    "#tab input"
-                )
-                .forEach(x => {
-
-                    x.value =
-                        tr[x.dataset.k] || "";
-                });
-
-
-            reset();
-        }
-
-
-        function scaricaProgetto() {
-
-            try {
-
-                let nome =
-                    prompt(
-                        "Nome del progetto:"
-                    );
-
-
-                if (!nome) {
-                    return;
-                }
-
-
-                let p =
-                    creaProgetto();
-
-
-                p.nome = nome;
-
-
-                let n =
-                    nome
-                        .replace(
-                            /[\\/:*?"<>|]+/g,
-                            "_"
-                        ) +
-                    ".json";
-
-
-                let b =
-                    new Blob(
-                        [
-                            JSON.stringify(
-                                p,
-                                null,
-                                2
-                            )
-                        ],
-                        {
-                            type:
-                                "application/json"
-                        }
-                    );
-
-
-                let a =
-                    document
-                        .createElement("a");
-
-
-                a.href =
-                    URL.createObjectURL(b);
-
-                a.download = n;
-
-                a.click();
-
-
-                URL.revokeObjectURL(
-                    a.href
-                );
-
-            } catch (e) {
-
-                alert(
-                    "Impossibile scaricare il progetto."
-                );
-            }
-        }
-
-
-        function caricaComputer() {
-
-            $("fileInput").click();
-        }
-
-
-        function leggiFile(e) {
-
-            let f =
-                e.target.files[0];
-
-
-            if (!f) {
-                return;
-            }
-
-
-            let r =
-                new FileReader();
-
-
-            r.onload = () => {
-
-                try {
-
-                    applicaProgetto(
-                        JSON.parse(
-                            r.result
-                        )
-                    );
-
-
-                    $("gitMsg").textContent =
-                        "Progetto caricato dal computer.";
-
-                } catch (x) {
-
-                    alert(
-                        "File progetto non valido."
-                    );
-                }
-
-
-                e.target.value = "";
-            };
-
-
-            r.readAsText(f);
-        }
-
-
-        /* =========================
-           GITHUB
-        ========================= */
-
-        function ghInfo() {
-
-            let h =
-                location.hostname;
-
-
-            if (
-                !h.endsWith(
-                    ".github.io"
-                )
-            ) {
-
-                throw Error(
-                    "Repository GitHub non riconosciuto."
-                );
-            }
-
-
-            let owner =
-                h.split(".")[0];
-
-
-            let p =
-                location.pathname
-                    .split("/")
-                    .filter(Boolean);
-
-
-            return {
-
-                owner: owner,
-
-                repo:
-                    p[0] ||
-                    owner + ".github.io"
-            };
-        }
-
-
-        function b64(s) {
-
-            let bytes =
-                new TextEncoder()
-                    .encode(s);
-
-            let bin = "";
-
-
-            bytes.forEach(x => {
-
-                bin +=
-                    String.fromCharCode(x);
-            });
-
-
-            return btoa(bin);
-        }
-
-
-        function fromB64(s) {
-
-            let bin =
-                atob(
-                    s.replace(/\s/g, "")
-                );
-
-
-            let b =
-                new Uint8Array(
-                    bin.length
-                );
-
-
-            for (
-                let i = 0;
-                i < bin.length;
-                i++
-            ) {
-
-                b[i] =
-                    bin.charCodeAt(i);
-            }
-
-
-            return new TextDecoder()
-                .decode(b);
-        }
-
-
-        /* =========================
-           TOKEN
-           ========================= */
-
-        const TOKEN_KEY =
-            "simulatore_turing_github_token";
-
-
-        function tokenGit() {
-
-            let token =
-                localStorage.getItem(
-                    TOKEN_KEY
-                );
-
-
-            if (token) {
-                return token.trim();
-            }
-
-
-            token =
-                prompt(
-                    "Inserisci il token GitHub:"
-                );
-
-
-            if (token === null) {
-                return "";
-            }
-
-
-            token =
-                token.trim();
-
-
-            if (!token) {
-
-                alert(
-                    "Token non inserito."
-                );
-
-                return "";
-            }
-
-
-            localStorage.setItem(
-                TOKEN_KEY,
-                token
-            );
-
-
-            return token;
-        }
-
-
-        function dimenticaToken() {
-
-            localStorage.removeItem(
-                TOKEN_KEY
-            );
-
-
-            $("gitMsg").textContent =
-                "Token eliminato dal browser.";
-
-            alert(
-                "Token eliminato. " +
-                "Al prossimo salvataggio " +
-                "verrà richiesto nuovamente."
-            );
-        }
-
-
-        /* =========================
-           GITHUB GET
-        ========================= */
-
-        async function ghGet(
-            path,
+          Authorization:
+            "Bearer " +
             token
-        ) {
 
-            let g =
-                ghInfo();
-
-
-            let u =
-                `https://api.github.com/repos/` +
-                `${g.owner}/${g.repo}/contents/${path}`;
-
-
-            let r =
-                await fetch(
-                    u,
-                    {
-                        headers: {
-
-                            Accept:
-                                "application/vnd.github+json",
-
-                            Authorization:
-                                "Bearer " +
-                                token
-                        }
-                    }
-                );
-
-
-            if (r.status == 404) {
-                return null;
-            }
-
-
-            if (!r.ok) {
-
-                throw Error(
-                    "GitHub: " +
-                    r.status
-                );
-            }
-
-
-            return r.json();
         }
 
+      }
+    );
 
-        /* =========================
-           GITHUB PUT
-        ========================= */
 
-        async function ghPut(
-            path,
-            text,
+  if(
+    response.status ===
+    404
+  ){
+
+    return null;
+
+  }
+
+
+  if(!response.ok){
+
+    let messaggio =
+      "";
+
+
+    try{
+
+      const data =
+        await response.json();
+
+
+      messaggio =
+        data.message ||
+        "";
+
+    }catch(e){}
+
+
+    throw Error(
+      "GitHub: " +
+      (
+        messaggio ||
+        response.status
+      )
+    );
+
+  }
+
+
+  return response.json();
+
+}
+
+
+/* =========================================================
+   GITHUB PUT
+   ========================================================= */
+
+async function ghPut(
+  path,
+  testo,
+  token,
+  sha,
+  messaggio
+){
+
+  const g =
+    ghInfo();
+
+
+  const url =
+    "https://api.github.com/repos/" +
+    encodeURIComponent(g.owner) +
+    "/" +
+    encodeURIComponent(g.repo) +
+    "/contents/" +
+    path;
+
+
+  const body = {
+
+    message:
+      messaggio,
+
+    content:
+      b64(testo)
+
+  };
+
+
+  if(sha){
+
+    body.sha =
+      sha;
+
+  }
+
+
+  const response =
+    await fetch(
+      url,
+      {
+
+        method:
+          "PUT",
+
+        headers:{
+
+          Accept:
+            "application/vnd.github+json",
+
+          "Content-Type":
+            "application/json",
+
+          Authorization:
+            "Bearer " +
             token,
-            sha,
-            msg
-        ) {
 
-            let g =
-                ghInfo();
+          "X-GitHub-Api-Version":
+            "2022-11-28"
 
+        },
 
-            let u =
-                `https://api.github.com/repos/` +
-                `${g.owner}/${g.repo}/contents/${path}`;
+        body:
+          JSON.stringify(
+            body
+          )
 
-
-            let body = {
-
-                message: msg,
-
-                content:
-                    b64(text)
-            };
+      }
+    );
 
 
-            if (sha) {
-                body.sha = sha;
-            }
+  if(!response.ok){
+
+    let messaggioGitHub =
+      "";
 
 
-            let r =
-                await fetch(
-                    u,
-                    {
-                        method: "PUT",
+    try{
 
-                        headers: {
-
-                            Accept:
-                                "application/vnd.github+json",
-
-                            "Content-Type":
-                                "application/json",
-
-                            Authorization:
-                                "Bearer " +
-                                token,
-
-                            "X-GitHub-Api-Version":
-                                "2022-11-28"
-                        },
-
-                        body:
-                            JSON.stringify(body)
-                    }
-                );
+      const data =
+        await response.json();
 
 
-            if (!r.ok) {
+      messaggioGitHub =
+        data.message ||
+        "";
 
-                let x = "";
-
-
-                try {
-
-                    x =
-                        (
-                            await r.json()
-                        ).message || "";
-
-                } catch (e) {}
+    }catch(e){}
 
 
-                throw Error(
-                    "GitHub: " +
-                    (x || r.status)
-                );
-            }
+    throw Error(
+      "GitHub: " +
+      (
+        messaggioGitHub ||
+        response.status
+      )
+    );
+
+  }
 
 
-            return r.json();
+  return response.json();
+
+}
+
+
+/* =========================================================
+   LISTA PROGETTI GITHUB
+   ========================================================= */
+
+async function listaGit(){
+
+  const select =
+    $("listaProgetti");
+
+
+  select.innerHTML =
+    "";
+
+
+  try{
+
+    const response =
+      await fetch(
+        "progetti/index.json?" +
+        Date.now(),
+        {
+          cache:
+            "no-store"
         }
+      );
 
 
-        /* =========================
-           ELENCO
-        ========================= */
+    if(!response.ok){
 
-        async function listaGit() {
+      throw Error(
+        "Elenco non disponibile."
+      );
 
-            let s =
-                $("listaProgetti");
-
-
-            try {
-
-                let r =
-                    await fetch(
-                        "progetti/index.json?" +
-                        Date.now(),
-                        {
-                            cache:
-                                "no-store"
-                        }
-                    );
+    }
 
 
-                if (!r.ok) {
-                    throw Error();
-                }
+    const elenco =
+      await response.json();
 
 
-                let a =
-                    await r.json();
+    if(!Array.isArray(elenco)){
+
+      throw Error(
+        "Elenco progetti non valido."
+      );
+
+    }
 
 
-                if (!Array.isArray(a)) {
-                    throw Error();
-                }
+    if(
+      elenco.length ===
+      0
+    ){
+
+      const option =
+        document.createElement(
+          "option"
+        );
 
 
-                s.innerHTML = "";
+      option.value =
+        "";
 
 
-                if (!a.length) {
-
-                    s.innerHTML =
-                        "<option>" +
-                        "Nessun progetto" +
-                        "</option>";
-
-                } else {
-
-                    a.forEach(x => {
-
-                        let o =
-                            document
-                                .createElement(
-                                    "option"
-                                );
+      option.textContent =
+        "Nessun progetto";
 
 
-                        o.value = x;
+      select.appendChild(
+        option
+      );
+
+    }else{
+
+      elenco.forEach(
+        nome => {
+
+          const option =
+            document.createElement(
+              "option"
+            );
 
 
-                        o.textContent =
-                            x.replace(
-                                /\.json$/i,
-                                ""
-                            );
+          option.value =
+            nome;
 
 
-                        s.appendChild(o);
-                    });
-                }
+          option.textContent =
+            String(nome)
+              .replace(
+                /\.json$/i,
+                ""
+              );
 
 
-                $("gitMsg").textContent =
-                    "Elenco aggiornato.";
+          select.appendChild(
+            option
+          );
 
-
-            } catch (e) {
-
-                s.innerHTML =
-                    "<option>" +
-                    "Git non raggiungibile" +
-                    "</option>";
-
-
-                $("gitMsg").textContent =
-                    "Git non raggiungibile.";
-            }
         }
+      );
+
+    }
 
 
-        /* =========================
-           CARICA GIT
-        ========================= */
+    $("gitMsg").textContent =
+      "Elenco aggiornato.";
 
-        async function caricaGit() {
+  }catch(e){
 
-            let nome =
-                $("listaProgetti")
-                    .value;
-
-
-            if (
-                !nome ||
-                nome ==
-                    "Git non raggiungibile" ||
-                nome ==
-                    "Nessun progetto"
-            ) {
-                return;
-            }
+    const option =
+      document.createElement(
+        "option"
+      );
 
 
-            try {
-
-                let r =
-                    await fetch(
-                        "progetti/" +
-                        encodeURIComponent(nome) +
-                        "?" +
-                        Date.now(),
-                        {
-                            cache:
-                                "no-store"
-                        }
-                    );
+    option.value =
+      "";
 
 
-                if (!r.ok) {
-                    throw Error();
-                }
+    option.textContent =
+      "Git non raggiungibile";
 
 
-                applicaProgetto(
-                    await r.json()
-                );
+    select.appendChild(
+      option
+    );
 
 
-                $("gitMsg").textContent =
-                    "Progetto caricato.";
+    $("gitMsg").textContent =
+      "Git non raggiungibile.";
+
+  }
+
+}
 
 
-            } catch (e) {
+/* =========================================================
+   CARICA PROGETTO DA GITHUB
+   ========================================================= */
 
-                $("gitMsg").textContent =
-                    "Impossibile caricare il progetto.";
-            }
+async function caricaGit(){
+
+  const nome =
+    $("listaProgetti").value;
+
+
+  if(!nome){
+
+    return;
+
+  }
+
+
+  try{
+
+    const response =
+      await fetch(
+        "progetti/" +
+        encodeURIComponent(nome) +
+        "?" +
+        Date.now(),
+        {
+          cache:
+            "no-store"
         }
+      );
 
 
-        /* =========================
-           SALVA GIT
-        ========================= */
+    if(!response.ok){
 
-        async function salvaGit() {
+      throw Error(
+        "Impossibile caricare il progetto."
+      );
 
-            try {
+    }
 
-                let nome =
-                    prompt(
-                        "Nome del progetto:"
-                    );
 
+    const progetto =
+      await response.json();
 
-                if (!nome) {
-                    return;
-                }
 
+    applicaConfigurazione(
+      progetto
+    );
 
-                /*
-                 * PASSWORD
-                 */
 
-                let password =
-                    prompt(
-                        "Password:"
-                    );
+    $("gitMsg").textContent =
+      "Progetto caricato.";
 
 
-                if (password === null) {
-                    return;
-                }
+    $("msg").textContent =
+      "Progetto caricato da Git.";
 
 
-                let pr =
-                    await fetch(
-                        "config/password.txt?" +
-                        Date.now(),
-                        {
-                            cache:
-                                "no-store"
-                        }
-                    );
+    chiudiProgetti();
 
+  }catch(e){
 
-                if (!pr.ok) {
+    $("gitMsg").textContent =
+      "Impossibile caricare il progetto.";
 
-                    throw Error(
-                        "Password non raggiungibile."
-                    );
-                }
 
+    alert(
+      e.message ||
+      "Errore durante il caricamento."
+    );
 
-                if (
-                    password.trim() !=
-                    (
-                        await pr.text()
-                    ).trim()
-                ) {
+  }
 
-                    alert(
-                        "Password errata."
-                    );
+}
 
-                    return;
-                }
 
+/* =========================================================
+   SALVA SU GITHUB
+   ========================================================= */
 
-                /*
-                 * TOKEN
-                 */
+async function salvaGit(){
 
-                let token =
-                    tokenGit();
+  try{
 
+    let nome =
+      prompt(
+        "Nome del progetto:",
+        "progetto"
+      );
 
-                if (!token) {
 
-                    $("gitMsg").textContent =
-                        "Salvataggio annullato.";
+    if(nome === null){
 
-                    return;
-                }
+      return;
 
+    }
 
-                /*
-                 * CREA PROGETTO
-                 */
 
-                let p =
-                    creaProgetto();
+    nome =
+      nome.trim();
 
 
-                p.nome = nome;
+    if(!nome){
 
+      nome =
+        "progetto";
 
-                /*
-                 * NOME FILE
-                 */
+    }
 
-                let file =
-                    nome
-                        .toLowerCase()
-                        .normalize("NFD")
-                        .replace(
-                            /[\u0300-\u036f]/g,
-                            ""
-                        )
-                        .replace(
-                            /[^a-z0-9]+/g,
-                            "-"
-                        )
-                        .replace(
-                            /^-|-$/g,
-                            ""
-                        ) +
-                    ".json";
 
+    /*
+     * Password del sito.
+     */
 
-                if (file == ".json") {
-                    file =
-                        "progetto.json";
-                }
+    const password =
+      prompt(
+        "Password:"
+      );
 
 
-                $("gitMsg").textContent =
-                    "Salvataggio...";
+    if(password === null){
 
+      return;
 
-                /*
-                 * CERCA FILE ESISTENTE
-                 */
+    }
 
-                let old =
-                    await ghGet(
-                        "progetti/" +
-                        file,
-                        token
-                    );
 
-
-                /*
-                 * SALVA PROGETTO
-                 */
-
-                await ghPut(
-                    "progetti/" +
-                    file,
-
-                    JSON.stringify(
-                        p,
-                        null,
-                        2
-                    ),
-
-                    token,
-
-                    old && old.sha,
-
-                    "Salva progetto " +
-                    nome
-                );
-
-
-                /*
-                 * LEGGI INDEX
-                 */
-
-                let ix =
-                    await ghGet(
-                        "progetti/index.json",
-                        token
-                    );
-
-
-                let elenco = [];
-
-
-                if (ix) {
-
-                    try {
-
-                        elenco =
-                            JSON.parse(
-                                fromB64(
-                                    ix.content
-                                )
-                            );
-
-                    } catch (e) {
-
-                        elenco = [];
-                    }
-                }
-
-
-                if (
-                    !Array.isArray(
-                        elenco
-                    )
-                ) {
-
-                    elenco = [];
-                }
-
-
-                if (
-                    !elenco.includes(
-                        file
-                    )
-                ) {
-
-                    elenco.push(file);
-                }
-
-
-                elenco.sort();
-
-
-                /*
-                 * AGGIORNA INDEX
-                 */
-
-                await ghPut(
-                    "progetti/index.json",
-
-                    JSON.stringify(
-                        elenco,
-                        null,
-                        2
-                    ),
-
-                    token,
-
-                    ix && ix.sha,
-
-                    "Aggiorna elenco progetti"
-                );
-
-
-                $("gitMsg").textContent =
-                    "Salvato: " +
-                    nome;
-
-
-                await listaGit();
-
-
-            } catch (e) {
-
-                console.error(e);
-
-
-                $("gitMsg").textContent =
-                    "Salvataggio Git non riuscito.";
-
-
-                /*
-                 * TOKEN SCADUTO / ERRATO
-                 */
-
-                if (
-                    e.message.includes(
-                        "401"
-                    ) ||
-                    e.message
-                        .toLowerCase()
-                        .includes(
-                            "bad credentials"
-                        ) ||
-                    e.message
-                        .toLowerCase()
-                        .includes(
-                            "unauthorized"
-                        )
-                ) {
-
-                    localStorage.removeItem(
-                        TOKEN_KEY
-                    );
-
-
-                    alert(
-                        "Il token GitHub non è valido " +
-                        "o è scaduto.\n\n" +
-                        "È stato eliminato dal browser. " +
-                        "Al prossimo salvataggio potrai " +
-                        "inserire quello nuovo."
-                    );
-
-                } else {
-
-                    alert(
-                        "Non è stato possibile " +
-                        "salvare su Git.\n\n" +
-                        e.message
-                    );
-                }
-            }
+    const passwordResponse =
+      await fetch(
+        "config/password.txt?" +
+        Date.now(),
+        {
+          cache:
+            "no-store"
         }
+      );
 
 
-        /* =========================
-           EVENTI
-        ========================= */
+    if(!passwordResponse.ok){
 
-        $("stato").onchange =
-            reset;
+      throw Error(
+        "Password non raggiungibile."
+      );
 
-        $("statoS").onchange =
-            reset;
-
-        $("nastro").onchange =
-            reset;
+    }
 
 
-        genera();
-        reset();
+    const passwordCorretta =
+      (
+        await passwordResponse.text()
+      ).trim();
 
-    </script>
+
+    if(
+      password.trim() !==
+      passwordCorretta
+    ){
+
+      alert(
+        "Password errata."
+      );
+
+
+      return;
+
+    }
+
+
+    /*
+     * Token GitHub.
+     */
+
+    const token =
+      tokenGit();
+
+
+    if(!token){
+
+      $("gitMsg").textContent =
+        "Salvataggio annullato.";
+
+      return;
+
+    }
+
+
+    /*
+     * Progetto corrente.
+     */
+
+    const progetto =
+      creaProgetto();
+
+
+    progetto.nome =
+      nome;
+
+
+    /*
+     * Nome file sicuro.
+     */
+
+    let file =
+      nome
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(
+          /[\u0300-\u036f]/g,
+          ""
+        )
+        .replace(
+          /[^a-z0-9]+/g,
+          "-"
+        )
+        .replace(
+          /^-+|-+$/g,
+          ""
+        );
+
+
+    if(!file){
+
+      file =
+        "progetto";
+
+    }
+
+
+    file +=
+      ".json";
+
+
+    $("gitMsg").textContent =
+      "Salvataggio...";
+
+
+    /*
+     * Controlliamo se esiste già.
+     */
+
+    const vecchio =
+      await ghGet(
+        "progetti/" +
+        file,
+        token
+      );
+
+
+    /*
+     * Salva il progetto.
+     */
+
+    await ghPut(
+      "progetti/" +
+      file,
+
+      JSON.stringify(
+        progetto,
+        null,
+        2
+      ),
+
+      token,
+
+      vecchio
+        ? vecchio.sha
+        : null,
+
+      "Salva progetto " +
+      nome
+    );
+
+
+    /*
+     * Recupera l'indice.
+     */
+
+    const index =
+      await ghGet(
+        "progetti/index.json",
+        token
+      );
+
+
+    let elenco =
+      [];
+
+
+    if(index){
+
+      try{
+
+        elenco =
+          JSON.parse(
+            fromB64(
+              index.content
+            )
+          );
+
+      }catch(e){
+
+        elenco =
+          [];
+
+      }
+
+    }
+
+
+    if(!Array.isArray(elenco)){
+
+      elenco =
+        [];
+
+    }
+
+
+    if(
+      !elenco.includes(file)
+    ){
+
+      elenco.push(
+        file
+      );
+
+    }
+
+
+    elenco.sort();
+
+
+    /*
+     * Aggiorna l'indice.
+     */
+
+    await ghPut(
+      "progetti/index.json",
+
+      JSON.stringify(
+        elenco,
+        null,
+        2
+      ),
+
+      token,
+
+      index
+        ? index.sha
+        : null,
+
+      "Aggiorna elenco progetti"
+    );
+
+
+    $("gitMsg").textContent =
+      "Salvato: " +
+      nome;
+
+
+    await listaGit();
+
+  }catch(e){
+
+    console.error(e);
+
+
+    $("gitMsg").textContent =
+      "Salvataggio Git non riuscito.";
+
+
+    const errore =
+      String(
+        e.message ||
+        e
+      );
+
+
+    const basso =
+      errore.toLowerCase();
+
+
+    if(
+      errore.includes("401") ||
+      basso.includes(
+        "bad credentials"
+      ) ||
+      basso.includes(
+        "unauthorized"
+      )
+    ){
+
+      localStorage.removeItem(
+        TOKEN_KEY
+      );
+
+
+      alert(
+        "Il token GitHub non è valido " +
+        "o è scaduto.\n\n" +
+        "Il token è stato eliminato " +
+        "dal browser."
+      );
+
+    }else{
+
+      alert(
+        "Non è stato possibile salvare su Git.\n\n" +
+        errore
+      );
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   CHIUSURA CONFRONTO CON CLICK FUORI
+   ========================================================= */
+
+$("modal").addEventListener(
+  "click",
+  function(event){
+
+    if(
+      event.target ===
+      $("modal")
+    ){
+
+      chiudiIstruzioni();
+
+    }
+
+  }
+);
+
+
+$("progettiModal").addEventListener(
+  "click",
+  function(event){
+
+    if(
+      event.target ===
+      $("progettiModal")
+    ){
+
+      chiudiProgetti();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   INIZIALIZZAZIONE
+   ========================================================= */
+
+try{
+
+  genera();
+
+  reset();
+
+  renderConfronto();
+
+}catch(e){
+
+  console.error(
+    "Errore inizializzazione:",
+    e
+  );
+
+
+  $("err").textContent =
+    "Errore durante l'avvio: " +
+    (
+      e.message ||
+      String(e)
+    );
+
+}
+</script>
 
 </body>
-
 </html>
