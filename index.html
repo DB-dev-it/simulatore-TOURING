@@ -193,6 +193,21 @@ td input{width:115px;border:0;text-align:center;font-family:monospace}
  <button onclick="reset()">Ricomincia</button>
  <button onclick="passo()">Esegui passo</button>
  <button onclick="avvia()">Azione</button>
+ 
+ <label>
+ Velocità:
+ <select id="velocita">
+  <option value="1">1 azione/s</option>
+  <option value="2">2 azioni/s</option>
+  <option value="5" selected>5 azioni/s</option>
+  <option value="10">10 azioni/s</option>
+  <option value="20">20 azioni/s</option>
+  <option value="50">50 azioni/s</option>
+  <option value="100">100 azioni/s</option>
+  <option value="illimitato">Illimitato</option>
+ </select>
+</label>
+
  <button onclick="ferma()">Ferma</button>
  <button onclick="aggiungiConfronto()">Aggiungi a confronto</button>
 </div>
@@ -1113,10 +1128,104 @@ function passo(){
 function avvia(){
 
   if(macchina.inEsecuzione){
+    return;
+  }
+
+  const velocita =
+    $("velocita").value;
+
+  /*
+   * Esecuzione immediata:
+   * tutti i passaggi vengono eseguiti
+   * senza animazione.
+   */
+
+  if(velocita === "illimitato"){
+
+    macchina.inEsecuzione = true;
+
+    $("msg").textContent =
+      "Esecuzione...";
+
+    let contatore = 0;
+
+    while(
+      macchina.inEsecuzione &&
+      contatore < LIMITE_PASSAGGI
+    ){
+
+      const prima =
+        macchina.turno;
+
+      passo();
+
+      contatore++;
+
+      /*
+       * Se passo() ha fermato la macchina,
+       * abbiamo raggiunto la fine.
+       */
+
+      if(!macchina.inEsecuzione){
+        break;
+      }
+
+      /*
+       * Sicurezza aggiuntiva.
+       */
+
+      if(
+        macchina.turno ===
+        prima
+      ){
+        break;
+      }
+
+    }
+
+    macchina.inEsecuzione =
+      false;
+
+    if(
+      macchina.turno >=
+      LIMITE_PASSAGGI
+    ){
+
+      $("msg").textContent =
+        "Esecuzione fermata: raggiunto il limite di " +
+        LIMITE_PASSAGGI +
+        " passaggi.";
+
+    }else{
+
+      $("msg").textContent =
+        "Risultato finale. Passaggi: " +
+        macchina.turno;
+
+    }
 
     return;
-
   }
+
+
+  /*
+   * Modalità con velocità scelta.
+   */
+
+  const azioniSecondo =
+    Number(velocita);
+
+  if(
+    !Number.isFinite(azioniSecondo) ||
+    azioniSecondo <= 0
+  ){
+
+    return;
+  }
+
+
+  const intervallo =
+    1000 / azioniSecondo;
 
 
   macchina.inEsecuzione =
@@ -1124,7 +1233,9 @@ function avvia(){
 
 
   $("msg").textContent =
-    "Macchina in esecuzione...";
+    "Macchina in esecuzione: " +
+    azioniSecondo +
+    " azioni/s";
 
 
   macchina.timer =
@@ -1134,19 +1245,17 @@ function avvia(){
         if(
           !macchina.inEsecuzione
         ){
-
           return;
-
         }
-
 
         passo();
 
       },
-      300
+      intervallo
     );
 
 }
+
 
 
 /* =========================================================
