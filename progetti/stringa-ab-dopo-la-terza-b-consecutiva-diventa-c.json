@@ -1,0 +1,29 @@
+{
+  "nome": "Stringa AB, dopo la terza B consecutiva diventa C",
+  "stato": "0",
+  "alfabeto": [
+    "A",
+    "B",
+    "C",
+    "*"
+  ],
+  "stati": [
+    "0",
+    "1",
+    "2"
+  ],
+  "transizioni": {
+    "0|A": "A,0,d",
+    "0|B": "B,1,d",
+    "0|C": "",
+    "0|*": "*,fine,d",
+    "1|A": "A,0,d",
+    "1|B": "B,2,d",
+    "1|C": "",
+    "1|*": "*,fine,d",
+    "2|A": "A,0,d",
+    "2|B": "C,2,d",
+    "2|C": "",
+    "2|*": "*,fine,d"
+  }
+}
