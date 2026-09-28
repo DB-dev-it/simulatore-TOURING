@@ -6337,226 +6337,445 @@ async function eliminaCartella(){
 async function spostaCartella(){
 
   if(!tokenSalvato()){
-    alert("Per spostare cartelle o progetti devi avere un token GitHub salvato nel browser.");
+
+    alert(
+      "Per spostare elementi devi avere un token GitHub salvato nel browser."
+    );
+
     return;
   }
 
-  const lista = $("listaProgetti");
+  if(!indiceProgetti){
 
-  if(!lista){
-    alert("Elenco dei progetti non disponibile.");
+    alert(
+      "Prima aggiorna l'elenco da Git."
+    );
+
     return;
   }
 
-  const selezione = lista.value;
+  const select =
+    $("listaProgetti");
 
-  if(!selezione){
-    alert("Seleziona prima una cartella o un progetto da spostare.");
+  const value =
+    select.value;
+
+  if(!value){
+
+    alert(
+      "Seleziona prima un file o una cartella da spostare."
+    );
+
     return;
   }
 
-  let elemento = null;
-  let tipo = "";
-
-  /*
-   * Cerca la selezione tra le cartelle.
-   */
   if(
-    indiceProgetti &&
-    Array.isArray(indiceProgetti.cartelle)
+    value ===
+    "__PARENT__"
   ){
 
-    elemento = indiceProgetti.cartelle.find(function(c){
-      return String(c.id) === String(selezione);
-    });
+    alert(
+      "La voce '..' non può essere spostata."
+    );
 
-    if(elemento){
-      tipo = "cartella";
-    }
+    return;
   }
 
-  /*
-   * Se non è una cartella, cerca tra i progetti.
-   */
+
+  /* =====================================================
+     IDENTIFICA L'ELEMENTO SELEZIONATO
+     ===================================================== */
+
+  let tipo =
+    "";
+
+  let elemento =
+    null;
+
   if(
-    !elemento &&
-    indiceProgetti &&
-    Array.isArray(indiceProgetti.progetti)
+    value.startsWith(
+      "project:"
+    )
   ){
 
-    elemento = indiceProgetti.progetti.find(function(p){
-      return String(p.id) === String(selezione);
-    });
+    tipo =
+      "progetto";
 
-    if(elemento){
-      tipo = "progetto";
-    }
+    const file =
+      value.slice(
+        "project:".length
+      );
+
+    elemento =
+      indiceProgetti.progetti.find(
+        function(p){
+
+          return p.file === file;
+
+        }
+      );
+
+  }else if(
+    value.startsWith(
+      "folder:"
+    )
+  ){
+
+    tipo =
+      "cartella";
+
+    const id =
+      value.slice(
+        "folder:".length
+      );
+
+    elemento =
+      trovaCartella(
+        id
+      );
+
   }
+
 
   if(!elemento){
-    alert("L'elemento selezionato non è stato trovato.");
+
+    alert(
+      "L'elemento selezionato non è più disponibile."
+    );
+
     return;
   }
 
-  /*
-   * Costruisce l'elenco delle cartelle disponibili.
-   */
-  const possibili = [];
 
-  if(
-    indiceProgetti &&
-    Array.isArray(indiceProgetti.cartelle)
-  ){
+  /* =====================================================
+     CARTELLA ATTUALE DELL'ELEMENTO
+     ===================================================== */
 
-    indiceProgetti.cartelle.forEach(function(c){
-
-      /*
-       * Una cartella non può essere spostata dentro se stessa.
-       */
-      if(
-        tipo === "cartella" &&
-        String(c.id) === String(elemento.id)
-      ){
-        return;
-      }
-
-      /*
-       * Una cartella non può essere spostata
-       * dentro una sua sottocartella.
-       */
-      if(
-        tipo === "cartella" &&
-        cartellaDiscendente(
-          c.id,
-          elemento.id
+  const posizioneAttuale =
+    elemento.cartella !== undefined
+      ? (
+          elemento.cartella ||
+          ""
         )
+      : (
+          elemento.parent ||
+          ""
+        );
+
+
+  /* =====================================================
+     COSTRUISCE LE DESTINAZIONI POSSIBILI
+     ===================================================== */
+
+  const destinazioni = [
+
+    {
+      id:"",
+      nome:"Principale"
+    }
+
+  ];
+
+
+  indiceProgetti.cartelle.forEach(
+    function(cartella){
+
+      /*
+       * Una cartella non può essere spostata:
+       *
+       * - dentro se stessa
+       * - dentro una sua sottocartella
+       *
+       * Inoltre non mostriamo la posizione attuale,
+       * perché sarebbe una destinazione senza effetto.
+       */
+
+      if(
+        tipo ===
+        "cartella"
       ){
+
+        if(
+          cartella.id ===
+          elemento.id
+        ){
+
+          return;
+        }
+
+        if(
+          cartellaDiscendente(
+            cartella.id,
+            elemento.id
+          )
+        ){
+
+          return;
+        }
+
+      }
+
+
+      if(
+        cartella.id ===
+        posizioneAttuale
+      ){
+
         return;
       }
 
-      possibili.push(c);
-    });
-  }
+      destinazioni.push({
 
-  /*
-   * Costruisce il testo della scelta.
-   */
-  const righe = [];
+        id:
+          cartella.id,
 
-  if(tipo === "cartella"){
-    righe.push(
-      'Cartella da spostare: "' +
-      (elemento.nome || elemento.name || "Cartella") +
-      '"'
-    );
-  }else{
-    righe.push(
-      'Progetto da spostare: "' +
-      (elemento.nome || elemento.name || "Progetto") +
-      '"'
-    );
-  }
+        nome:
+          nomePercorsoCartellaPerId(
+            cartella.id
+          )
 
-  righe.push("");
-  righe.push("Cartelle disponibili:");
-  righe.push("0 = Principale");
+      });
 
-  possibili.forEach(function(c, indice){
-
-    righe.push(
-      String(indice + 1) +
-      " = " +
-      nomePercorsoCartellaPerId(c.id)
-    );
-
-  });
-
-  /*
-   * Chiede la destinazione.
-   */
-  const risposta = prompt(
-    righe.join("\n") +
-    "\n\nInserisci il numero della cartella di destinazione:"
+    }
   );
 
-  if(risposta === null){
+
+  /* =====================================================
+     NESSUNA DESTINAZIONE
+     ===================================================== */
+
+  if(
+    destinazioni.length ===
+    0
+  ){
+
+    alert(
+      'Non ci sono cartelle disponibili dove spostare "' +
+      (
+        elemento.nome ||
+        elemento.file ||
+        "l'elemento selezionato"
+      ) +
+      '".'
+    );
+
     return;
   }
 
-  const numero = Number(risposta);
+
+  /* =====================================================
+     MOSTRA LE DESTINAZIONI
+     ===================================================== */
+
+  const righe = [
+
+    'Elemento da spostare: "' +
+    (
+      elemento.nome ||
+      elemento.file
+    ) +
+    '"',
+
+    "",
+
+    "Sposta in:",
+
+  ];
+
+
+  destinazioni.forEach(
+    function(destinazione, indice){
+
+      righe.push(
+        indice +
+        " = " +
+        destinazione.nome
+      );
+
+    }
+  );
+
+
+  const risposta =
+    prompt(
+      righe.join("\n") +
+      "\n\nInserisci il numero della cartella di destinazione:"
+    );
+
+
+  if(
+    risposta ===
+    null
+  ){
+
+    return;
+  }
+
+
+  const numero =
+    Number(
+      risposta
+    );
+
 
   if(
     !Number.isInteger(numero) ||
     numero < 0 ||
-    numero > possibili.length
+    numero >= destinazioni.length
   ){
 
-    alert("Destinazione non valida.");
+    alert(
+      "Destinazione non valida."
+    );
+
     return;
   }
 
-  /*
-   * 0 significa cartella principale.
-   */
-  let destinazione = "";
 
-  if(numero > 0){
-    destinazione = possibili[numero - 1].id;
+  const destinazione =
+    destinazioni[
+      numero
+    ].id;
+
+
+  /* =====================================================
+     CONTROLLO DESTINAZIONE
+     ===================================================== */
+
+  if(
+    destinazione ===
+    posizioneAttuale
+  ){
+
+    alert(
+      "L'elemento si trova già in questa cartella."
+    );
+
+    return;
   }
 
-  /*
-   * Controlli aggiuntivi per le cartelle.
-   */
-  if(tipo === "cartella"){
 
-    if(
-      String(destinazione) ===
-      String(elemento.id)
-    ){
+  if(
+    tipo ===
+    "cartella" &&
+    destinazione &&
+    cartellaDiscendente(
+      destinazione,
+      elemento.id
+    )
+  ){
 
-      alert(
-        "Una cartella non può essere spostata dentro se stessa."
-      );
+    alert(
+      "Non puoi spostare una cartella dentro una sua sottocartella."
+    );
 
-      return;
-    }
-
-    if(
-      destinazione &&
-      cartellaDiscendente(
-        destinazione,
-        elemento.id
-      )
-    ){
-
-      alert(
-        "Non puoi spostare una cartella dentro una sua sottocartella."
-      );
-
-      return;
-    }
+    return;
   }
 
-  /*
-   * Esegue lo spostamento.
-   */
-  elemento.parent = destinazione;
 
-  /*
-   * IMPORTANTE:
-   * non cambiamo cartellaCorrente.
-   */
-  await salvaIndiceConControllo(
-    (tipo === "cartella" ? "Sposta cartella " : "Sposta progetto ") +
-    (elemento.nome || elemento.name || "Elemento")
-  );
+  /* =====================================================
+     ESEGUE LO SPOSTAMENTO
+     ===================================================== */
 
-  /*
-   * Aggiorna la lista.
-   */
-  listaGit();
+  if(
+    tipo ===
+    "progetto"
+  ){
+
+    elemento.cartella =
+      destinazione;
+
+  }else if(
+    tipo ===
+    "cartella"
+  ){
+
+    elemento.parent =
+      destinazione;
+
+  }
+
+
+  const nomeElemento =
+    elemento.nome ||
+    elemento.file ||
+    "Elemento";
+
+
+  const salvato =
+    await salvaIndiceConControllo(
+      "Sposta " +
+      (
+        tipo === "progetto"
+          ? "progetto "
+          : "cartella "
+      ) +
+      nomeElemento
+    );
+
+
+  if(!salvato){
+
+    /*
+     * Se il salvataggio Git fallisce, ripristiniamo
+     * la posizione precedente.
+     */
+
+    if(
+      tipo ===
+      "progetto"
+    ){
+
+      elemento.cartella =
+        posizioneAttuale;
+
+    }else{
+
+      elemento.parent =
+        posizioneAttuale;
+
+    }
+
+    return;
+  }
+
+
+  /* =====================================================
+     DOPO LO SPOSTAMENTO
+     ===================================================== */
+
+  if(
+    tipo ===
+    "cartella"
+  ){
+
+    /*
+     * Entriamo automaticamente nella cartella
+     * di destinazione.
+     */
+
+    cartellaCorrente =
+      destinazione;
+
+  }
+
+
+  renderListaProgetti();
+
+  $("gitMsg").textContent =
+    '"' +
+    nomeElemento +
+    '" spostato in ' +
+    (
+      destinazione
+        ? nomePercorsoCartellaPerId(
+            destinazione
+          )
+        : "Principale"
+    ) +
+    ".";
+
 }
-
 
 function cartellaDiscendente(
   possibileDiscendente,
