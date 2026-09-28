@@ -1,14 +1,72 @@
-[
-  "addizione-base-1-mantenimento.json",
-  "ciao.json",
-  "differenza-in-base-1-avanzata.json",
-  "differenza-in-base-1-base.json",
-  "inverti-0-e-1.json",
-  "moltiplica-x8-binario.json",
-  "n-di-a-pari-0-dispari-1.json",
-  "n-di-a-pari-o-dispari-1.json",
-  "somma-base-1.json",
-  "stringa-a-b-c-ogni-3.json",
-  "stringa-ab-dopo-la-terza-b-consecutiva-diventa-c.json",
-  "stringa-ab-ultima-c.json"
-]
+{
+  "version": 2,
+  "cartelle": [
+    {
+      "id": "cartella-mulccgaq-rftnl8",
+      "nome": "stringhe",
+      "parent": ""
+    }
+  ],
+  "progetti": [
+    {
+      "file": "addizione-base-1-mantenimento.json",
+      "nome": "addizione-base-1-mantenimento",
+      "cartella": ""
+    },
+    {
+      "file": "ciao.json",
+      "nome": "ciao",
+      "cartella": ""
+    },
+    {
+      "file": "differenza-in-base-1-avanzata.json",
+      "nome": "differenza-in-base-1-avanzata",
+      "cartella": ""
+    },
+    {
+      "file": "differenza-in-base-1-base.json",
+      "nome": "differenza-in-base-1-base",
+      "cartella": ""
+    },
+    {
+      "file": "inverti-0-e-1.json",
+      "nome": "inverti-0-e-1",
+      "cartella": ""
+    },
+    {
+      "file": "moltiplica-x8-binario.json",
+      "nome": "moltiplica-x8-binario",
+      "cartella": ""
+    },
+    {
+      "file": "n-di-a-pari-0-dispari-1.json",
+      "nome": "n-di-a-pari-0-dispari-1",
+      "cartella": ""
+    },
+    {
+      "file": "n-di-a-pari-o-dispari-1.json",
+      "nome": "n-di-a-pari-o-dispari-1",
+      "cartella": ""
+    },
+    {
+      "file": "somma-base-1.json",
+      "nome": "somma-base-1",
+      "cartella": ""
+    },
+    {
+      "file": "stringa-a-b-c-ogni-3.json",
+      "nome": "stringa-a-b-c-ogni-3",
+      "cartella": ""
+    },
+    {
+      "file": "stringa-ab-dopo-la-terza-b-consecutiva-diventa-c.json",
+      "nome": "stringa-ab-dopo-la-terza-b-consecutiva-diventa-c",
+      "cartella": ""
+    },
+    {
+      "file": "stringa-ab-ultima-c.json",
+      "nome": "stringa-ab-ultima-c",
+      "cartella": ""
+    }
+  ]
+}
