@@ -7441,48 +7441,10 @@ async function salvaGit(){
         "progetto";
     }
 
-    const password =
-      prompt(
-        "Password:"
-      );
-
-    if(password === null){
-      return;
-    }
-
-    const passwordResponse =
-      await fetch(
-        "config/password.txt?" +
-        Date.now(),
-        {
-          cache:
-            "no-store"
-        }
-      );
-
-    if(!passwordResponse.ok){
-
-      throw Error(
-        "Password non raggiungibile."
-      );
-    }
-
-    const passwordCorretta =
-      (
-        await passwordResponse.text()
-      ).trim();
-
-    if(
-      password.trim() !==
-      passwordCorretta
-    ){
-
-      alert(
-        "Password errata."
-      );
-
-      return;
-    }
+    /*
+     * Il token GitHub è l'unica autorizzazione
+     * necessaria per salvare il progetto.
+     */
 
     const token =
       tokenGit();
