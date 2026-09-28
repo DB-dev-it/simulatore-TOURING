@@ -72,6 +72,11 @@
       "file": "stringa-ab-ultima-c.json",
       "nome": "stringa-ab-ultima-c",
       "cartella": "cartella-mulccgaq-rftnl8"
+    },
+    {
+      "file": "numero-successivo-base-2.json",
+      "nome": "numero successivo base 2",
+      "cartella": ""
     }
   ]
 }
