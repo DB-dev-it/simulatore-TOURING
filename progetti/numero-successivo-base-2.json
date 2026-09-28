@@ -1,0 +1,22 @@
+{
+  "nome": "numero successivo base 2",
+  "stato": "0",
+  "alfabeto": [
+    "0",
+    "1",
+    "*"
+  ],
+  "stati": [
+    "0"
+  ],
+  "transizioni": {
+    "0|0": "1,fine,d",
+    "0|1": "0,0,s",
+    "0|*": "1,fine,s",
+    "fine|0": "",
+    "fine|1": "",
+    "fine|*": ""
+  },
+  "posizioneIniziale": 2,
+  "cartella": ""
+}
