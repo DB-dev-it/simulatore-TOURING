@@ -77,6 +77,11 @@
       "file": "numero-successivo-base-2.json",
       "nome": "numero successivo base 2",
       "cartella": ""
+    },
+    {
+      "file": "numero-successivo-base-10.json",
+      "nome": "numero successivo base 10",
+      "cartella": "cartella-mulccgaq-rftnl8"
     }
   ]
 }
