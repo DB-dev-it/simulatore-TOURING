@@ -3,381 +3,2752 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Macchina di Turing</title>
 
 <style>
-*{box-sizing:border-box}
-body{font-family:Arial;margin:10px;color:#111}
-h1{font-size:25px;margin:4px 0 8px}
-button,input,select,textarea{font:inherit}
-button{margin:2px;padding:5px 8px;cursor:pointer}
-input,select{max-width:100%}
-textarea{width:100%;height:150px;font-family:monospace}
 
-.cfg{display:flex;flex-wrap:wrap;gap:7px;margin:7px 0}
-.cfg label{display:flex;flex-direction:column;font-size:12px}
-.cfg input{height:25px}
+*{
+  box-sizing:border-box;
+}
 
-.tab{overflow:auto;margin:7px 0}
-table{border-collapse:collapse}
-td,th{border:1px solid #999;padding:3px;text-align:center}
-th{background:#eee}
-td input{width:115px;border:0;text-align:center;font-family:monospace}
+:root{
+  --bg:#f5f6f8;
+  --surface:#ffffff;
+  --surface2:#f8f9fb;
+  --border:#e1e4e9;
+  --border-strong:#cbd0d8;
+  --text:#171a1f;
+  --muted:#707782;
 
-.err{color:#b00000;font-size:13px;white-space:pre-wrap}
-#gitMsg{font-size:12px;margin:5px 0}
+  --primary:#315efb;
+  --primary-dark:#244bd0;
+  --primary-soft:#eef2ff;
+
+  --danger:#d64545;
+  --success:#17845b;
+
+  --header:#151922;
+
+  --machine:#f4f5f7;
+  --machine-border:#d8dbe0;
+
+  --head:#ff43d8;
+  --shadow:0 3px 14px rgba(20,25,35,.06);
+
+  --radius:12px;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+
+  background:var(--bg);
+  color:var(--text);
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+
+  -webkit-font-smoothing:antialiased;
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  border:1px solid var(--border-strong);
+  background:#fff;
+  color:var(--text);
+
+  border-radius:8px;
+  padding:8px 12px;
+
+  cursor:pointer;
+
+  transition:
+    background .15s,
+    border-color .15s,
+    transform .05s;
+}
+
+button:hover:not(:disabled){
+  background:#f3f5f8;
+  border-color:#b8bec8;
+}
+
+button:active:not(:disabled){
+  transform:translateY(1px);
+}
+
+button:disabled{
+  cursor:not-allowed;
+  opacity:.5;
+}
+
+input,
+select{
+  border:1px solid var(--border-strong);
+  background:#fff;
+  color:var(--text);
+
+  border-radius:8px;
+  padding:8px 9px;
+
+  outline:none;
+}
+
+input:focus,
+select:focus{
+  border-color:var(--primary);
+
+  box-shadow:
+    0 0 0 3px rgba(49,94,251,.1);
+}
+
+code{
+  background:#eef0f4;
+  padding:2px 5px;
+  border-radius:5px;
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.appHeader{
+  background:var(--header);
+  color:#fff;
+
+  padding:0 24px;
+
+  box-shadow:
+    0 2px 10px rgba(0,0,0,.14);
+}
+
+.headerInner{
+  width:min(1400px,100%);
+  min-height:62px;
+
+  margin:auto;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:15px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+
+  gap:10px;
+
+  min-width:0;
+}
+
+.brandIcon{
+  width:36px;
+  height:36px;
+
+  flex:0 0 36px;
+
+  border-radius:9px;
+
+  background:var(--primary);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-family:monospace;
+  font-size:19px;
+  font-weight:800;
+
+  box-shadow:
+    0 3px 10px rgba(49,94,251,.3);
+}
+
+.brandText{
+  min-width:0;
+}
+
+.brandTitle{
+  font-size:17px;
+  font-weight:700;
+  line-height:1.1;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.brandSubtitle{
+  font-size:10px;
+  color:#aeb5c2;
+
+  margin-top:3px;
+}
+
+.headerActions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.headerActions button{
+  color:#e8ebf0;
+  background:transparent;
+  border-color:#39404d;
+
+  padding:7px 10px;
+}
+
+.headerActions button:hover:not(:disabled){
+  background:#242a35;
+  border-color:#505867;
+}
+
+
+/* =========================================================
+   LAYOUT PRINCIPALE
+   ========================================================= */
+
+.app{
+  width:min(1400px,100%);
+
+  margin:0 auto;
+
+  padding:20px 24px 40px;
+}
+
+.mainGrid{
+  display:grid;
+
+  grid-template-columns:
+    minmax(0,1fr);
+
+  gap:16px;
+
+  align-items:start;
+}
+
+.leftColumn,
+.rightColumn{
+  min-width:0;
+}
+
+.card{
+  background:var(--surface);
+
+  border:1px solid var(--border);
+
+  border-radius:var(--radius);
+
+  box-shadow:var(--shadow);
+
+  padding:17px;
+
+  margin-bottom:16px;
+}
+
+.card:last-child{
+  margin-bottom:0;
+}
+
+.cardHeader{
+  display:flex;
+
+  align-items:flex-start;
+  justify-content:space-between;
+
+  gap:14px;
+
+  margin-bottom:14px;
+}
+
+.cardTitle{
+  margin:0;
+
+  font-size:17px;
+  font-weight:700;
+
+  line-height:1.25;
+}
+
+.cardDescription{
+  margin:4px 0 0;
+
+  color:var(--muted);
+
+  font-size:12px;
+  line-height:1.45;
+}
+
+.sectionLabel{
+  font-size:12px;
+  font-weight:700;
+
+  color:var(--muted);
+
+  text-transform:uppercase;
+  letter-spacing:.05em;
+
+  margin-bottom:8px;
+}
+
+
+/* =========================================================
+   CONFIGURAZIONE
+   ========================================================= */
+
+.cfg{
+  display:grid;
+
+  grid-template-columns:
+    minmax(130px,1fr)
+    minmax(180px,1.5fr)
+    minmax(150px,1.2fr);
+
+  gap:10px;
+}
+
+.cfg label{
+  display:flex;
+  flex-direction:column;
+
+  gap:6px;
+
+  font-size:12px;
+  font-weight:600;
+
+  color:var(--muted);
+}
+
+.cfg input{
+  width:100%;
+  height:39px;
+}
+
+.configActions{
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:7px;
+
+  margin-top:13px;
+}
+
+.btnPrimary{
+  background:var(--primary);
+  border-color:var(--primary);
+  color:#fff;
+}
+
+.btnPrimary:hover:not(:disabled){
+  background:var(--primary-dark);
+  border-color:var(--primary-dark);
+}
+
+.btnDanger{
+  color:var(--danger);
+}
+
+.btnSmall{
+  padding:6px 9px;
+  font-size:12px;
+}
+
+
+/* =========================================================
+   TABELLA TRANSIZIONI
+   ========================================================= */
+
+.tableWrapper{
+  overflow:auto;
+
+  border:1px solid var(--border);
+
+  border-radius:9px;
+
+  background:var(--surface2);
+
+  -webkit-overflow-scrolling:touch;
+}
+
+.tab{
+  overflow:auto;
+  margin:0;
+
+  -webkit-overflow-scrolling:touch;
+}
+
+table{
+  border-collapse:separate;
+  border-spacing:0;
+}
+
+#tab table{
+  width:100%;
+  min-width:520px;
+}
+
+#tab td,
+#tab th{
+  border-right:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+
+  padding:0;
+
+  text-align:center;
+}
+
+#tab tr:last-child td,
+#tab tr:last-child th{
+  border-bottom:0;
+}
+
+#tab td:last-child,
+#tab th:last-child{
+  border-right:0;
+}
+
+#tab th{
+  background:#f0f2f5;
+
+  color:#505967;
+
+  font-size:12px;
+  font-weight:700;
+
+  padding:9px 10px;
+
+  white-space:nowrap;
+}
+
+#tab tbody th{
+  background:#f7f8fa;
+
+  min-width:80px;
+}
+
+#tab td input{
+  width:100%;
+  min-width:105px;
+  height:39px;
+
+  border:0;
+  border-radius:0;
+
+  background:#fff;
+
+  text-align:center;
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+
+  font-size:12px;
+}
+
+#tab td input:focus{
+  box-shadow:
+    inset 0 0 0 2px var(--primary);
+
+  position:relative;
+  z-index:1;
+}
+
+#tab td input::placeholder{
+  color:#a2a8b2;
+}
+
+
+/* =========================================================
+   NASTRO INIZIALE
+   ========================================================= */
+
+.tapeInputRow{
+  display:flex;
+  align-items:center;
+
+  gap:9px;
+}
+
+.tapeInputRow label{
+  font-size:12px;
+  font-weight:700;
+
+  color:var(--muted);
+
+  white-space:nowrap;
+}
+
+#nastro{
+  flex:1;
+  min-width:0;
+
+  font-family:monospace;
+}
+
+
+/* =========================================================
+   CONTROLLI SIMULAZIONE
+   ========================================================= */
+
+.simControls{
+  display:flex;
+
+  align-items:center;
+
+  flex-wrap:wrap;
+
+  gap:7px;
+}
+
+.simControls button{
+  margin:0;
+}
+
+.speedControl{
+  display:flex;
+
+  align-items:center;
+
+  gap:7px;
+
+  margin-left:auto;
+}
+
+.speedControl span{
+  color:var(--muted);
+
+  font-size:12px;
+  font-weight:600;
+}
+
+.speedControl select{
+  height:36px;
+}
+
+#err{
+  margin:9px 0 0;
+
+  color:#b00000;
+
+  font-size:13px;
+
+  white-space:pre-wrap;
+}
+
+
+/* =========================================================
+   MACCHINA
+   ========================================================= */
 
 #machine{
- width:min(100%,620px);
- background:#10e8e8;
- padding:10px;
- margin:10px 0;
- text-align:center;
- overflow:hidden
+  width:100%;
+
+  margin:0;
+
+  background:
+    #f4f6f7;
+
+  border:1px solid var(--machine-border);
+
+  border-radius:12px;
+
+  padding:15px;
+
+  text-align:center;
+
+  overflow:hidden;
+}
+
+.machineHeader{
+  display:flex;
+
+  align-items:center;
+  justify-content:space-between;
+
+  gap:10px;
+
+  margin-bottom:13px;
+}
+
+.machineTitle{
+  text-align:left;
+}
+
+.machineTitle strong{
+  display:block;
+
+  font-size:15px;
+}
+
+.machineTitle span{
+  display:block;
+
+  color:#737b85;
+
+  font-size:11px;
+
+  margin-top:2px;
 }
 
 #machineTop{
- display:flex;
- justify-content:center;
- gap:25px;
- flex-wrap:wrap
+  display:flex;
+
+  justify-content:flex-end;
+
+  gap:7px;
+
+  flex-wrap:wrap;
+}
+
+.machineStat{
+  background:#fff;
+
+  border:1px solid #dfe2e6;
+
+  border-radius:8px;
+
+  padding:6px 9px;
+
+  font-size:11px;
+
+  color:#737b85;
+}
+
+.machineStat b{
+  color:#171a1f;
+
+  font-size:13px;
+
+  margin-left:3px;
 }
 
 #bubble{
- display:inline-block;
- background:white;
- border:2px solid #111;
- padding:2px 8px;
- border-radius:20px;
- margin-left:5px
+  display:inline-flex;
+
+  align-items:center;
+  justify-content:center;
+
+  min-width:27px;
+
+  background:#fff;
+
+  border:1px solid #d4d8de;
+
+  padding:2px 7px;
+
+  border-radius:20px;
+
+  margin-left:4px;
+
+  color:#171a1f;
 }
 
+
+/* =========================================================
+   NASTRO DELLA MACCHINA
+   ========================================================= */
+
 .tapeBox{
- display:flex;
- align-items:center;
- justify-content:center;
- gap:5px;
- margin:12px auto 5px;
- width:100%
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  gap:7px;
+
+  margin:17px auto 7px;
+
+  width:100%;
 }
 
 .scroll{
- width:30px;
- height:35px;
- padding:0;
- margin:0;
- flex:0 0 30px;
- font-size:20px
+  width:34px;
+  height:38px;
+
+  padding:0;
+
+  margin:0;
+
+  flex:0 0 34px;
+
+  font-size:20px;
+
+  border-color:#cbd0d6;
+
+  background:#fff;
+}
+
+.scroll:hover:not(:disabled){
+  background:#f5f6f8;
 }
 
 .tape{
- display:flex;
- justify-content:center;
- overflow:hidden;
- width:420px;
- max-width:calc(100% - 70px)
+  display:flex;
+
+  justify-content:center;
+
+  overflow:hidden;
+
+  width:435px;
+
+  max-width:calc(100% - 82px);
+
+  border-radius:7px;
 }
 
 .cell{
- flex:0 0 27px;
- width:27px;
- height:35px;
- border:1px solid #999;
- background:white;
- display:flex;
- align-items:center;
- justify-content:center;
- font-family:monospace
+  flex:0 0 29px;
+
+  width:29px;
+  height:38px;
+
+  border:1px solid #cdd2d8;
+
+  border-right:0;
+
+  background:#fff;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+
+  font-size:13px;
+
+  user-select:none;
+
+  cursor:pointer;
 }
 
-.head{background:#ff38d8;font-weight:bold}
+.cell:first-child{
+  border-radius:6px 0 0 6px;
+}
+
+.cell:last-child{
+  border-right:1px solid #cdd2d8;
+
+  border-radius:0 6px 6px 0;
+}
+
+.cell.head{
+  background:var(--head);
+
+  color:#17101a;
+
+  font-weight:bold;
+
+  border-color:#df24bc;
+}
+
+.cell.clickable{
+  cursor:pointer;
+}
+
+.cell.clickable:hover{
+  background:#ff9be9;
+}
+
+#posizioneInfo{
+  font-size:10px;
+
+  color:#747c85;
+
+  margin-top:7px;
+}
 
 #msg{
- font-size:12px;
- background:#ffffffaa;
- padding:4px;
- margin-top:5px
+  font-size:12px;
+
+  color:#3d454e;
+
+  background:#fff;
+
+  border:1px solid #dfe2e6;
+
+  border-radius:8px;
+
+  padding:8px 10px;
+
+  margin:9px 0 0;
 }
 
-#confronto{margin-top:15px;max-width:900px}
-.confrontoBox{
- border:1px solid #999;
- padding:10px;
- margin-top:8px;
- overflow:auto
+
+/* =========================================================
+   PANNELLO LATERALE
+   ========================================================= */
+
+.infoCard{
+  position:sticky;
+  top:18px;
 }
-#tabConfronto{width:100%;min-width:650px}
-#tabConfronto td,#tabConfronto th{padding:5px}
-.nomeConfronto{font-weight:bold;white-space:nowrap}
-.risultatoConfronto{font-family:monospace;white-space:pre}
-.confrontoAzioni{white-space:nowrap}
-#confrontoVuoto{color:#666;font-size:13px}
+
+.infoRow{
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:15px;
+
+  padding:9px 0;
+
+  border-bottom:1px solid var(--border);
+
+  font-size:12px;
+}
+
+.infoRow:last-child{
+  border-bottom:0;
+}
+
+.infoRow span:first-child{
+  color:var(--muted);
+}
+
+.infoRow strong{
+  font-family:monospace;
+
+  text-align:right;
+}
+
+.legend{
+  margin-top:14px;
+
+  padding:11px;
+
+  border-radius:9px;
+
+  background:var(--surface2);
+
+  border:1px solid var(--border);
+
+  font-size:11px;
+
+  line-height:1.6;
+
+  color:var(--muted);
+}
+
+.legend b{
+  color:var(--text);
+}
+
+
+/* =========================================================
+   CONFRONTO
+   ========================================================= */
+
+#confronto{
+  margin:0;
+  max-width:none;
+}
+
+.confrontoInput{
+  display:flex;
+
+  align-items:center;
+
+  flex-wrap:wrap;
+
+  gap:7px;
+
+  margin-bottom:13px;
+}
+
+.confrontoInput label{
+  font-size:12px;
+
+  color:var(--muted);
+
+  font-weight:600;
+}
+
+#confrontoNastro{
+  min-width:180px;
+}
+
+.confrontoBox{
+  border:1px solid var(--border);
+
+  border-radius:9px;
+
+  padding:0;
+
+  overflow:auto;
+
+  -webkit-overflow-scrolling:touch;
+}
+
+#tabConfronto{
+  width:100%;
+
+  min-width:800px;
+}
+
+#tabConfronto td,
+#tabConfronto th{
+  padding:9px 8px;
+
+  border:0;
+
+  border-bottom:1px solid var(--border);
+}
+
+#tabConfronto tr:last-child td{
+  border-bottom:0;
+}
+
+#tabConfronto th{
+  background:#f3f4f6;
+
+  color:#59616d;
+
+  font-size:11px;
+
+  text-transform:uppercase;
+
+  letter-spacing:.03em;
+}
+
+#tabConfronto td{
+  font-size:12px;
+}
+
+.nomeConfronto{
+  font-weight:bold;
+
+  white-space:nowrap;
+}
+
+.risultatoConfronto{
+  font-family:monospace;
+
+  white-space:pre;
+}
+
+.confrontoAzioni{
+  white-space:nowrap;
+}
+
+.confrontoAzioni button{
+  padding:5px 7px;
+
+  font-size:11px;
+}
+
+#confrontoVuoto{
+  color:#747e8e;
+
+  font-size:12px;
+
+  padding:18px;
+
+  text-align:center;
+}
+
+
+/* =========================================================
+   MODALI
+   ========================================================= */
 
 .modal{
- display:none;
- position:fixed;
- inset:0;
- background:#0008;
- align-items:center;
- justify-content:center;
- padding:15px;
- z-index:100
+  display:none;
+
+  position:fixed;
+
+  inset:0;
+
+  background:rgba(12,18,30,.6);
+
+  align-items:center;
+  justify-content:center;
+
+  padding:18px;
+
+  z-index:100;
+
+  backdrop-filter:blur(3px);
 }
-.modal.open{display:flex}
+
+.modal.open{
+  display:flex;
+}
 
 .box{
- background:white;
- padding:15px;
- max-width:700px;
- width:100%;
- max-height:85vh;
- overflow:auto
+  background:#fff;
+
+  border:1px solid var(--border);
+
+  border-radius:14px;
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.2);
+
+  padding:20px;
+
+  max-width:780px;
+
+  width:100%;
+
+  max-height:88vh;
+
+  overflow:auto;
 }
 
-.box h2{margin-top:0}
-#listaProgetti{width:100%;height:180px}
+.box h2{
+  margin:0 0 16px;
 
-@media(max-width:600px){
- body{margin:6px}
- h1{font-size:21px}
- button{font-size:12px;padding:4px 6px}
- textarea{height:125px}
- #machine{margin-left:0;width:100%;padding:6px}
- .tape{width:270px}
- .cell{flex-basis:27px;width:27px;height:32px}
- td input{width:100px}
- .scroll{width:27px;flex-basis:27px;height:32px}
+  font-size:19px;
 }
+
+.modalClose{
+  float:right;
+
+  width:32px;
+  height:32px;
+
+  padding:0;
+
+  border-radius:8px;
+
+  font-size:19px;
+
+  line-height:1;
+}
+
+
+/* =========================================================
+   PROGETTI
+   ========================================================= */
+
+.listaControlli{
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:6px;
+
+  margin:0 0 10px;
+}
+
+.listaControlli button{
+  margin:0;
+
+  font-size:12px;
+}
+
+.progettiBarra{
+  display:flex;
+
+  align-items:center;
+
+  flex-wrap:wrap;
+
+  gap:6px;
+
+  margin:0 0 7px;
+}
+
+.progettiBarra button{
+  margin:0;
+
+  width:35px;
+  height:35px;
+
+  padding:0;
+}
+
+.percorsoCartella{
+  flex:1;
+
+  min-width:200px;
+
+  height:35px;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:7px;
+
+  border:1px solid var(--border);
+
+  background:#f5f6f8;
+
+  border-radius:8px;
+
+  padding:6px 9px;
+
+  font-size:12px;
+
+  font-weight:700;
+
+  color:#465164;
+}
+
+#listaProgetti{
+  width:100%;
+
+  height:220px;
+
+  padding:5px;
+
+  border-radius:9px;
+
+  background:#fafbfc;
+}
+
+#listaProgetti option{
+  padding:5px;
+}
+
+.infoCartella{
+  font-size:12px;
+
+  color:#555;
+
+  margin:5px 0;
+}
+
+.doppioClickInfo{
+  font-size:11px;
+
+  color:#687386;
+
+  margin-top:7px;
+}
+
+.separatore{
+  border:0;
+
+  border-top:1px solid var(--border);
+
+  margin:14px 0;
+}
+
+#gitMsg{
+  color:var(--muted);
+
+  font-size:12px;
+
+  margin:8px 0 0;
+
+  min-height:16px;
+}
+
+.iconaCartella{
+  width:18px;
+  height:18px;
+
+  flex:0 0 auto;
+
+  fill:currentColor;
+
+  display:inline-block;
+}
+
+
+/* =========================================================
+   ISTRUZIONI
+   ========================================================= */
+
+.instructionIntro{
+  padding:12px 14px;
+
+  margin-bottom:18px;
+
+  border:1px solid var(--border);
+
+  border-radius:10px;
+
+  background:var(--bg);
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:4px;
+}
+
+.instructionIntro span{
+  color:var(--muted);
+
+  font-size:12px;
+}
+
+.instructionExample{
+  margin:10px 0;
+}
+
+.instructions h3{
+  margin-top:22px;
+  margin-bottom:7px;
+}
+
+.instructions code{
+  padding:2px 5px;
+
+  border-radius:5px;
+
+  background:var(--bg);
+}
+
+.instructions{
+  color:#4f5b6d;
+
+  font-size:13px;
+
+  line-height:1.6;
+}
+
+.instructions li{
+  margin:5px 0;
+}
+
+.instructions strong{
+  color:var(--text);
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media(max-width:1050px){
+
+  .mainGrid{
+    grid-template-columns:1fr;
+  }
+
+  .infoCard{
+    position:static;
+  }
+
+}
+
+
+/* =========================================================
+   VERSIONE TELEFONO
+   ========================================================= */
+
+@media(max-width:700px){
+
+  body{
+    background:#f5f6f8;
+  }
+
+
+  /* -------------------------
+     HEADER
+     ------------------------- */
+
+  .appHeader{
+    padding:0 12px;
+
+    position:sticky;
+    top:0;
+
+    z-index:50;
+  }
+
+  .headerInner{
+    min-height:56px;
+
+    gap:8px;
+  }
+
+  .brand{
+    gap:8px;
+
+    min-width:0;
+  }
+
+  .brandIcon{
+    width:32px;
+    height:32px;
+
+    flex-basis:32px;
+
+    border-radius:8px;
+
+    font-size:17px;
+  }
+
+  .brandTitle{
+    font-size:15px;
+  }
+
+  .brandSubtitle{
+    display:none;
+  }
+
+
+  /*
+     Il pulsante "Progetti" diventa il
+     pulsante menu visivo sul telefono.
+     Il pulsante Istruzioni resta disponibile
+     come secondo controllo compatto.
+  */
+
+  .headerActions{
+    gap:4px;
+  }
+
+  .headerActions button{
+    padding:6px 8px;
+
+    font-size:10px;
+  }
+
+  #btnProgetti{
+    width:38px;
+    height:34px;
+
+    padding:0;
+
+    font-size:0;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+  }
+
+  #btnProgetti::after{
+    content:"☰";
+
+    font-size:20px;
+
+    line-height:1;
+  }
+
+  #btnIstruzioni{
+    padding:6px 7px;
+  }
+
+
+  /* -------------------------
+     CONTENITORE
+     ------------------------- */
+
+  .app{
+    width:100%;
+
+    padding:8px 8px 24px;
+  }
+
+  .mainGrid{
+    display:block;
+  }
+
+  .leftColumn{
+    width:100%;
+  }
+
+
+  /* -------------------------
+     CARD
+     ------------------------- */
+
+  .card{
+    border-radius:10px;
+
+    box-shadow:
+      0 1px 5px rgba(20,25,35,.04);
+
+    padding:12px;
+
+    margin-bottom:9px;
+  }
+
+  .cardHeader{
+    margin-bottom:10px;
+
+    gap:8px;
+  }
+
+  .cardTitle{
+    font-size:15px;
+  }
+
+  .cardDescription{
+    font-size:11px;
+
+    line-height:1.4;
+  }
+
+
+  /* -------------------------
+     CONFIGURAZIONE
+     ------------------------- */
+
+  .cfg{
+    display:grid;
+
+    grid-template-columns:1fr;
+
+    gap:7px;
+  }
+
+  .cfg label{
+    gap:4px;
+
+    font-size:11px;
+  }
+
+  .cfg input{
+    height:38px;
+
+    font-size:14px;
+  }
+
+  .configActions{
+    display:grid;
+
+    grid-template-columns:1fr;
+
+    gap:6px;
+
+    margin-top:9px;
+  }
+
+  .configActions button{
+    width:100%;
+
+    height:40px;
+  }
+
+
+  /* -------------------------
+     TABELLA
+     ------------------------- */
+
+  .tableWrapper{
+    border-radius:8px;
+
+    overflow-x:auto;
+    overflow-y:hidden;
+  }
+
+  .tab{
+    width:100%;
+
+    overflow-x:auto;
+    overflow-y:hidden;
+  }
+
+  #tab table{
+    min-width:500px;
+  }
+
+  #tab th{
+    padding:8px;
+
+    font-size:11px;
+  }
+
+  #tab td input{
+    height:38px;
+
+    min-width:95px;
+
+    font-size:11px;
+  }
+
+
+  /* -------------------------
+     SIMULAZIONE
+     ------------------------- */
+
+  .tapeInputRow{
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:stretch;
+
+    gap:4px;
+  }
+
+  .tapeInputRow label{
+    font-size:11px;
+  }
+
+  #nastro{
+    width:100%;
+
+    height:39px;
+
+    font-size:14px;
+  }
+
+
+  /* -------------------------
+     CONTROLLI GRANDI
+     ------------------------- */
+
+  .simControls{
+    display:grid;
+
+    grid-template-columns:
+      repeat(4,minmax(0,1fr));
+
+    gap:6px;
+
+    margin-top:10px !important;
+  }
+
+  .simControls button{
+    width:100%;
+
+    min-height:42px;
+
+    padding:5px 3px;
+
+    font-size:11px;
+  }
+
+  /*
+     Ordine visivo:
+
+     Ricomincia
+     Passo
+     Azione
+     Ferma
+     Velocità
+     Confronto
+  */
+
+  #btnReset{
+    grid-column:1;
+    grid-row:1;
+  }
+
+  #btnPasso{
+    grid-column:2;
+    grid-row:1;
+  }
+
+  #btnAvvia{
+    grid-column:3;
+    grid-row:1;
+  }
+
+  #btnFerma{
+    grid-column:4;
+    grid-row:1;
+  }
+
+  .speedControl{
+    grid-column:1 / -1;
+    grid-row:2;
+
+    width:100%;
+
+    margin:0;
+
+    display:flex;
+
+    gap:6px;
+  }
+
+  .speedControl span{
+    display:none;
+  }
+
+  .speedControl select{
+    width:100%;
+
+    height:40px;
+
+    font-size:12px;
+  }
+
+  #btnAggiungiConfronto{
+    grid-column:1 / -1;
+    grid-row:3;
+
+    min-height:38px;
+  }
+
+  #err{
+    font-size:11px;
+
+    margin-top:7px;
+  }
+
+
+  /* -------------------------
+     MACCHINA
+     ------------------------- */
+
+  #machine{
+    padding:11px 7px;
+
+    border-radius:10px;
+
+    background:#f1f3f5;
+
+    border-color:#d9dde2;
+  }
+
+  .machineHeader{
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:stretch;
+
+    gap:8px;
+
+    margin-bottom:9px;
+  }
+
+  .machineTitle{
+    text-align:left;
+  }
+
+  .machineTitle strong{
+    font-size:13px;
+  }
+
+  .machineTitle span{
+    font-size:10px;
+  }
+
+  #machineTop{
+    display:grid;
+
+    grid-template-columns:
+      repeat(3,1fr);
+
+    gap:5px;
+
+    width:100%;
+  }
+
+  .machineStat{
+    padding:6px 4px;
+
+    border-radius:7px;
+
+    font-size:9px;
+
+    text-align:center;
+  }
+
+  .machineStat b{
+    font-size:11px;
+
+    margin-left:2px;
+  }
+
+  #bubble{
+    min-width:22px;
+
+    padding:1px 5px;
+  }
+
+
+  /* -------------------------
+     NASTRO
+     ------------------------- */
+
+  .tapeBox{
+    gap:4px;
+
+    margin:12px auto 6px;
+  }
+
+  .tape{
+    width:calc(100% - 62px);
+
+    max-width:none;
+  }
+
+  .scroll{
+    width:29px;
+    height:36px;
+
+    flex:0 0 29px;
+
+    font-size:18px;
+
+    padding:0;
+  }
+
+  .cell{
+    flex:0 0 27px;
+
+    width:27px;
+    height:36px;
+
+    font-size:12px;
+  }
+
+  #posizioneInfo{
+    font-size:9px;
+
+    line-height:1.35;
+
+    padding:0 4px;
+  }
+
+  #msg{
+    font-size:11px;
+
+    padding:7px 8px;
+
+    margin-top:7px;
+  }
+
+
+  /* -------------------------
+     CONFRONTO
+     ------------------------- */
+
+  #confronto{
+    margin-top:0;
+  }
+
+  .confrontoInput{
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:stretch;
+
+    gap:6px;
+  }
+
+  .confrontoInput label{
+    font-size:11px;
+  }
+
+  #confrontoNastro{
+    width:100%;
+
+    min-width:0;
+
+    height:39px;
+  }
+
+  .confrontoInput button{
+    width:100%;
+
+    min-height:39px;
+  }
+
+  .confrontoBox{
+    overflow-x:auto;
+  }
+
+  #tabConfronto{
+    min-width:760px;
+  }
+
+
+  /* -------------------------
+     MODALI
+     ------------------------- */
+
+  .modal{
+    padding:8px;
+
+    align-items:flex-end;
+  }
+
+  .box{
+    width:100%;
+
+    max-width:none;
+
+    max-height:92vh;
+
+    padding:14px;
+
+    border-radius:13px 13px 0 0;
+  }
+
+  .box h2{
+    font-size:17px;
+
+    margin-bottom:13px;
+  }
+
+
+  /* -------------------------
+     PROGETTI
+     ------------------------- */
+
+  .listaControlli{
+    display:grid;
+
+    grid-template-columns:
+      1fr 1fr;
+
+    gap:6px;
+  }
+
+  .listaControlli button{
+    min-height:38px;
+
+    font-size:11px;
+  }
+
+  .progettiBarra{
+    display:flex;
+
+    gap:5px;
+  }
+
+  .percorsoCartella{
+    min-width:0;
+
+    font-size:11px;
+  }
+
+  #listaProgetti{
+    height:200px;
+  }
+
+
+  /* -------------------------
+     ISTRUZIONI
+     ------------------------- */
+
+  .instructions{
+    font-size:12px;
+
+    line-height:1.55;
+  }
+
+  .instructions h3{
+    font-size:14px;
+
+    margin-top:18px;
+  }
+
+}
+
+
+/* =========================================================
+   TELEFONI MOLTO STRETTI
+   ========================================================= */
+
+@media(max-width:430px){
+
+  .appHeader{
+    padding:0 9px;
+  }
+
+  .headerInner{
+    min-height:54px;
+  }
+
+  .brandIcon{
+    width:31px;
+    height:31px;
+
+    flex-basis:31px;
+  }
+
+  .brandTitle{
+    font-size:14px;
+  }
+
+  #btnIstruzioni{
+    display:none;
+  }
+
+  #btnProgetti{
+    width:36px;
+    height:32px;
+  }
+
+
+  .app{
+    padding:
+      7px
+      7px
+      20px;
+  }
+
+  .card{
+    padding:10px;
+
+    margin-bottom:8px;
+
+    border-radius:9px;
+  }
+
+  .cardTitle{
+    font-size:14px;
+  }
+
+  .cardDescription{
+    font-size:10px;
+  }
+
+
+  /*
+     Su schermi molto stretti i quattro
+     comandi principali rimangono affiancati,
+     come nella grafica richiesta.
+  */
+
+  .simControls{
+    grid-template-columns:
+      repeat(4,minmax(0,1fr));
+
+    gap:4px;
+  }
+
+  .simControls button{
+    min-height:40px;
+
+    font-size:10px;
+
+    padding:4px 2px;
+  }
+
+  .speedControl select{
+    height:38px;
+
+    font-size:11px;
+  }
+
+  #btnAggiungiConfronto{
+    font-size:10px;
+  }
+
+
+  #machine{
+    padding:9px 5px;
+  }
+
+  .machineStat{
+    font-size:8px;
+
+    padding:5px 2px;
+  }
+
+  .machineStat b{
+    font-size:10px;
+  }
+
+  .tape{
+    width:calc(100% - 58px);
+  }
+
+  .scroll{
+    width:27px;
+    flex-basis:27px;
+
+    height:34px;
+  }
+
+  .cell{
+    flex-basis:25px;
+
+    width:25px;
+    height:34px;
+
+    font-size:11px;
+  }
+
+  #posizioneInfo{
+    font-size:8px;
+  }
+
+}
+
+
+/* =========================================================
+   ACCESSIBILITÀ
+   ========================================================= */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible{
+  outline:2px solid var(--primary);
+
+  outline-offset:2px;
+}
+
+
+/* =========================================================
+   TOUCH
+   ========================================================= */
+
+@media(pointer:coarse){
+
+  button{
+    min-height:38px;
+  }
+
+  input,
+  select{
+    min-height:38px;
+  }
+
+  .cell{
+    -webkit-tap-highlight-color:transparent;
+  }
+
+}
+
+
 </style>
 </head>
 
 <body>
 
-<h1>La macchina di Turing</h1>
+<header class="appHeader">
 
-<div>
- <button onclick="apriIstruzioni()">Istruzioni</button>
- <button onclick="apriProgetti()">Progetti</button>
-</div>
+  <div class="headerInner">
 
-<div class="cfg">
+    <div class="brand">
 
- <label>
-  Stato iniziale
-  <input id="statoS" value="0">
- </label>
+      <div class="brandIcon">T</div>
 
- <label>
-  Alfabeto
-  <input id="alf" value="X,Y,*">
- </label>
+      <div class="brandText">
+        <div class="brandTitle">
+          Macchina di Turing
+        </div>
+        <div class="brandSubtitle">
+          Costruisci, simula e confronta le tue macchine
+        </div>
+      </div>
 
- <label>
-  Stati
-  <input id="stati" value="0,1,2,3,4">
- </label>
+    </div>
 
-</div>
+    <div class="headerActions">
 
-<button onclick="genera()">Genera tabella</button>
-<button onclick="pulisciTabella()">Pulisci tabella</button>
+      <button id="btnIstruzioni">
+        Istruzioni
+      </button>
 
-<div class="tab" id="tab"></div>
+      <button id="btnProgetti">
+        Progetti
+      </button>
 
-<div class="row">
- Nastro iniziale:
- <input id="nastro" value="">
-</div>
+    </div>
 
-<div>
- <button onclick="reset()">Ricomincia</button>
- <button onclick="passo()">Esegui passo</button>
- <button onclick="avvia()">Azione</button>
- 
- <label>
- Velocità:
- <select id="velocita">
-  <option value="1">1 azione/s</option>
-  <option value="2">2 azioni/s</option>
-  <option value="5" selected>5 azioni/s</option>
-  <option value="10">10 azioni/s</option>
-  <option value="20">20 azioni/s</option>
-  <option value="50">50 azioni/s</option>
-  <option value="100">100 azioni/s</option>
-  <option value="illimitato">Illimitato</option>
- </select>
-</label>
-
- <button onclick="ferma()">Ferma</button>
- <button onclick="aggiungiConfronto()">Aggiungi a confronto</button>
-</div>
-
-<p id="err" class="err"></p>
-
-<div id="machine">
-
- <div id="machineTop">
-
-  <div>
-   Turno:
-   <b id="turno">0</b>
   </div>
 
-  <div>
-   Stato:
-   <b id="bubble">0</b>
+</header>
+
+
+<main class="app">
+
+  <div class="mainGrid">
+
+    <!-- =====================================================
+         COLONNA PRINCIPALE
+         ===================================================== -->
+
+    <div class="leftColumn">
+
+      <!-- CONFIGURAZIONE -->
+
+      <section class="card">
+
+        <div class="cardHeader">
+
+          <div>
+            <h2 class="cardTitle">
+              Costruisci la macchina
+            </h2>
+
+            <p class="cardDescription">
+              Definisci lo stato iniziale, l'alfabeto e gli stati
+              della macchina.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="cfg">
+
+          <label>
+            Stato iniziale
+            <input id="statoS" value="0">
+          </label>
+
+          <label>
+            Alfabeto
+            <input id="alf" value="X,Y,*">
+          </label>
+
+          <label>
+            Stati
+            <input id="stati" value="0,1,2,3,4">
+          </label>
+
+        </div>
+
+
+        <div class="configActions">
+
+          <button
+            id="btnGenera"
+            class="btnPrimary"
+          >
+            Genera tabella
+          </button>
+
+          <button id="btnPulisci">
+            Pulisci tabella
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- TABELLA -->
+
+      <section class="card">
+
+        <div class="cardHeader">
+
+          <div>
+            <h2 class="cardTitle">
+              Tabella delle transizioni
+            </h2>
+
+            <p class="cardDescription">
+              Inserisci una transizione nel formato
+              <code>lettera,stato,spostamento</code>.
+              S = sinistra, D = destra.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="tableWrapper">
+
+          <div
+            class="tab"
+            id="tab"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- NASTRO + CONTROLLI -->
+
+      <section class="card">
+
+        <div class="cardHeader">
+
+          <div>
+            <h2 class="cardTitle">
+              Simulazione
+            </h2>
+
+            <p class="cardDescription">
+              Imposta il nastro iniziale e controlla l'esecuzione
+              della macchina.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="tapeInputRow">
+
+          <label for="nastro">
+            Nastro iniziale
+          </label>
+
+          <input
+            id="nastro"
+            value=""
+            placeholder="es. XXYYXY"
+          >
+
+        </div>
+
+
+        <div
+          class="simControls"
+          style="margin-top:13px"
+        >
+
+          <button id="btnReset">
+            Ricomincia
+          </button>
+
+          <button
+            id="btnPasso"
+            class="btnPrimary"
+          >
+            Esegui passo
+          </button>
+
+          <button id="btnAvvia">
+            Azione
+          </button>
+
+          <div class="speedControl">
+
+            <span>
+              Velocità
+            </span>
+
+            <select id="velocita">
+
+              <option value="1">
+                1 azione/s
+              </option>
+
+              <option value="2">
+                2 azioni/s
+              </option>
+
+              <option value="5" selected>
+                5 azioni/s
+              </option>
+
+              <option value="10">
+                10 azioni/s
+              </option>
+
+              <option value="20">
+                20 azioni/s
+              </option>
+
+              <option value="50">
+                50 azioni/s
+              </option>
+
+              <option value="100">
+                100 azioni/s
+              </option>
+
+              <option value="illimitato">
+                Illimitato
+              </option>
+
+            </select>
+
+          </div>
+
+          <button id="btnFerma">
+            Ferma
+          </button>
+
+          <button id="btnAggiungiConfronto">
+            Aggiungi a confronto
+          </button>
+
+        </div>
+
+
+        <p
+          id="err"
+          class="err"
+        ></p>
+
+      </section>
+
+
+      <!-- MACCHINA -->
+
+      <section class="card">
+
+        <div id="machine">
+
+          <div class="machineHeader">
+
+            <div class="machineTitle">
+
+              <strong>
+                Macchina in esecuzione
+              </strong>
+
+              <span>
+                Stato corrente e posizione della testina
+              </span>
+
+            </div>
+
+
+            <div id="machineTop">
+
+              <div class="machineStat">
+                Turno:
+                <b id="turno">0</b>
+              </div>
+
+              <div class="machineStat">
+                Stato:
+                <b id="bubble">0</b>
+              </div>
+
+              <div class="machineStat">
+                Testina:
+                <b id="posizioneTestina">0</b>
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="tapeBox">
+
+            <button
+              class="scroll"
+              id="btnScrollSinistra"
+              aria-label="Scorri nastro a sinistra"
+            >
+              ←
+            </button>
+
+            <div
+              class="tape"
+              id="tape"
+            ></div>
+
+            <button
+              class="scroll"
+              id="btnScrollDestra"
+              aria-label="Scorri nastro a destra"
+            >
+              →
+            </button>
+
+          </div>
+
+
+          <div id="posizioneInfo">
+            Doppio click su una casella per spostare la testina.
+            Le frecce spostano solo la visualizzazione.
+          </div>
+
+
+          <div id="msg">
+            Pronto
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- CONFRONTO -->
+
+      <section
+        class="card"
+        id="confronto"
+      >
+
+        <div class="cardHeader">
+
+          <div>
+            <h2 class="cardTitle">
+              Confronto
+            </h2>
+
+            <p class="cardDescription">
+              Esegui più macchine sullo stesso nastro iniziale.
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="confrontoInput">
+
+          <label for="confrontoNastro">
+            Nastro comune
+          </label>
+
+          <input
+            id="confrontoNastro"
+            value=""
+          >
+
+          <button
+            id="btnEseguiConfronto"
+            class="btnPrimary"
+          >
+            Esegui confronto
+          </button>
+
+          <button
+            id="btnSvuotaConfronto"
+            class="btnDanger"
+          >
+            Svuota
+          </button>
+
+        </div>
+
+
+        <div class="confrontoBox">
+
+          <div id="confrontoVuoto">
+            Nessuna macchina aggiunta al confronto.
+          </div>
+
+
+          <table
+            id="tabConfronto"
+            style="display:none"
+          >
+
+            <thead>
+
+              <tr>
+
+                <th>Nome</th>
+                <th>Posizione iniziale</th>
+                <th>Risultato</th>
+                <th>Passaggi</th>
+                <th>Istruzioni</th>
+                <th>Stati</th>
+                <th>Azioni</th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody
+              id="corpoConfronto"
+            ></tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+    </div>
+
+
+
+
   </div>
 
- </div>
+</main>
 
- <div class="tapeBox">
 
-  <button class="scroll" onclick="scrollTape(-4)">←</button>
+<!-- =========================================================
+     MODALE PROGETTI
+     ========================================================= -->
 
-  <div class="tape" id="tape"></div>
+<div
+  class="modal"
+  id="progettiModal"
+>
 
-  <button class="scroll" onclick="scrollTape(4)">→</button>
+  <div class="box">
 
- </div>
+    <button
+      id="btnChiudiProgetti"
+      class="modalClose"
+      aria-label="Chiudi"
+    >
+      ×
+    </button>
 
- <div id="msg">Pronto</div>
 
-</div>
+    <h2>
+      Progetti
+    </h2>
 
-<div id="confronto">
 
- <h2>Confronto</h2>
+    <div class="listaControlli">
 
- <div>
-  <label>
-   Nastro comune:
-   <input id="confrontoNastro" value="">
-  </label>
+      <button id="btnCaricaGit">
+        Carica da Git
+      </button>
 
-  <button onclick="eseguiConfronto()">Esegui confronto</button>
-  <button onclick="svuotaConfronto()">Svuota</button>
- </div>
+      <button id="btnCaricaComputer">
+        Carica da computer
+      </button>
 
- <div class="confrontoBox">
+      <button id="btnScarica">
+        Scarica progetto
+      </button>
 
-  <div id="confrontoVuoto">
-   Nessuna macchina aggiunta al confronto.
+      <button id="btnSalvaGit">
+        Salva su Git
+      </button>
+
+      <button id="btnDimenticaToken">
+        Dimentica token
+      </button>
+
+    </div>
+
+
+    <div class="progettiBarra">
+
+      <div
+        id="percorsoCartella"
+        class="percorsoCartella"
+      >
+
+        <svg
+          class="iconaCartella"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d="M3 6.5A2.5 2.5 0 0 1 5.5 4H10l2 2h6.5A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/>
+        </svg>
+
+        <span>
+          Principale
+        </span>
+
+      </div>
+
+
+      <button
+        id="btnAggiornaGit"
+        title="Aggiorna elenco da GitHub"
+      >
+        ↻
+      </button>
+
+    </div>
+
+
+    <!--
+      Questi controlli sono volutamente sotto
+      alla barra dei pulsanti Git.
+    -->
+
+    <div class="listaControlli">
+
+      <button id="btnSpostaCartella">
+        Sposta
+      </button>
+
+      <button id="btnEliminaCartella">
+        Elimina
+      </button>
+
+      <button id="btnCreaCartella">
+        Crea cartella
+      </button>
+
+    </div>
+
+
+    <hr class="separatore">
+
+
+    <p>
+      <b>Progetti nella cartella:</b>
+    </p>
+
+
+    <select
+      id="listaProgetti"
+      size="9"
+    ></select>
+
+
+    <p id="gitMsg"></p>
+
+
+    <p class="doppioClickInfo">
+      Doppio click su una cartella per entrarci.
+      Doppio click su un progetto per caricarlo da Git.
+    </p>
+
+
+    <input
+      id="fileInput"
+      type="file"
+      accept=".json,application/json"
+      style="display:none"
+    >
+
   </div>
 
-  <table id="tabConfronto" style="display:none">
-
-   <thead>
-    <tr>
-     <th>Nome</th>
-     <th>Risultato</th>
-     <th>Passaggi</th>
-     <th>Istruzioni</th>
-     <th>Stati</th>
-     <th>Azioni</th>
-    </tr>
-   </thead>
-
-   <tbody id="corpoConfronto"></tbody>
-
-  </table>
-
- </div>
 </div>
 
-<div class="modal" id="progettiModal">
 
- <div class="box">
+<!-- =========================================================
+     MODALE ISTRUZIONI
+     ========================================================= -->
 
-  <button onclick="chiudiProgetti()" style="float:right">×</button>
+<div
+  class="modal"
+  id="modal"
+>
 
-  <h2>Progetti</h2>
+  <div class="box">
 
-  <button onclick="listaGit()">Aggiorna Git</button>
-  <button onclick="caricaGit()">Carica da Git</button>
-  <button onclick="caricaComputer()">Carica da computer</button>
-  <button onclick="scaricaProgetto()">Scarica</button>
-  <button onclick="salvaGit()">Salva su Git</button>
-  <button onclick="dimenticaToken()">Dimentica token</button>
+    <button
+      id="btnChiudiIstruzioni"
+      class="modalClose"
+      aria-label="Chiudi"
+    >
+      ×
+    </button>
 
-  <p>Progetti su Git:</p>
 
-  <select id="listaProgetti" size="7"></select>
+    <h2>
+      Istruzioni
+    </h2>
 
-  <p id="gitMsg"></p>
 
-  <input
-   id="fileInput"
-   type="file"
-   accept=".json,application/json"
-   style="display:none"
-   onchange="leggiFile(event)"
-  >
+<div class="instructions">
 
- </div>
-</div>
+  <div class="instructionIntro">
+    <strong>Guida rapida al simulatore</strong>
+    <span>Segui i passaggi nell'ordine per costruire, eseguire, confrontare e salvare una Macchina di Turing.</span>
+  </div>
 
-<div class="modal" id="modal">
+  <h3>1. Come funziona una Macchina di Turing</h3>
+  <p>La macchina lavora su un <strong>nastro</strong> potenzialmente infinito in entrambe le direzioni. La <strong>testina</strong> legge e scrive un simbolo, mentre lo <strong>stato corrente</strong> determina quale istruzione eseguire.</p>
+  <p>Ogni transizione segue questa sequenza: <strong>leggi → scrivi → cambia stato → sposta la testina</strong>.</p>
 
- <div class="box">
-
-  <button onclick="chiudiIstruzioni()" style="float:right">×</button>
-
-  <h2>Istruzioni</h2>
-
+  <h3>2. Crea la macchina</h3>
   <ul>
-   <li>La macchina parte dal turno 0.</li>
-   <li>Ogni transizione aumenta il turno di 1.</li>
-   <li>Il turno comprende anche la transizione che porta a fine.</li>
-   <li>I simboli dell'alfabeto sono separati da virgola.</li>
-   <li><b>*</b> rappresenta la casella vuota.</li>
-   <li>Ogni cella contiene <code>lettera,stato,spostamento</code>.</li>
-   <li><b>S</b> = sinistra, <b>D</b> = destra.</li>
-   <li>La macchina si ferma se non trova una transizione.</li>
-   <li>Lo stato <b>fine</b> termina l'esecuzione.</li>
-   <li>Il confronto può contenere massimo 5 macchine.</li>
+    <li><strong>Stato iniziale:</strong> stato da cui parte la simulazione.</li>
+    <li><strong>Alfabeto:</strong> simboli separati da virgola, per esempio <code>X,Y,*</code>.</li>
+    <li><strong>Stati:</strong> stati separati da virgola, per esempio <code>0,1,2</code>.</li>
+  </ul>
+  <p>Premi <strong>Genera tabella</strong> per creare le celle delle transizioni. La riga <code>fine</code> viene sempre mostrata automaticamente.</p>
+
+  <h3>3. Scrivi le transizioni</h3>
+  <p>Ogni cella corrisponde a una coppia <strong>stato + simbolo letto</strong>. Il formato è:</p>
+  <p class="instructionExample"><code>X,1,D</code></p>
+  <ul>
+    <li><strong>X</strong> = simbolo da scrivere;</li>
+    <li><strong>1</strong> = stato successivo;</li>
+    <li><strong>D</strong> = spostamento a destra.</li>
+  </ul>
+  <p><strong>S</strong> sposta a sinistra, <strong>D</strong> a destra. Il simbolo <strong>*</strong> rappresenta una casella vuota.</p>
+  <p>Prima dell'esecuzione vengono controllati formato, simbolo scritto, stato successivo e movimento. Lo stato <strong>fine</strong> è valido come stato successivo: quando viene raggiunto, la macchina si arresta.</p>
+
+  <h3>4. Nastro e posizione della testina</h3>
+  <p>Inserisci il contenuto iniziale nel campo <strong>Nastro iniziale</strong>. La posizione <strong>0</strong> corrisponde alla prima cella del testo inserito; sono possibili anche posizioni negative.</p>
+  <ul>
+    <li>Le frecce del nastro spostano solo la visualizzazione.</li>
+    <li>Il <strong>doppio click</strong> su una cella sposta la testina e imposta quella posizione come <strong>nuova posizione iniziale</strong>.</li>
+    <li><strong>Ricomincia</strong> riporta la macchina a quella posizione iniziale.</li>
   </ul>
 
- </div>
+  <h3>5. Esegui la simulazione</h3>
+  <ul>
+    <li><strong>Esegui passo:</strong> esegue una sola transizione.</li>
+    <li><strong>Azione:</strong> avvia l'esecuzione automatica alla velocità scelta.</li>
+    <li><strong>Ferma:</strong> interrompe l'esecuzione automatica.</li>
+    <li><strong>Illimitato:</strong> esegue più velocemente possibile, ma resta attivo un limite massimo di sicurezza di <strong>1.000.000 di passaggi</strong>.</li>
+  </ul>
+  <p>La macchina si arresta anche quando raggiunge <strong>fine</strong> oppure quando non esiste una transizione valida per la situazione corrente.</p>
+
+  <h3>6. Confronto tra macchine</h3>
+  <p><strong>Aggiungi a confronto</strong> salva una copia indipendente della configurazione corrente, compresa la <strong>posizione iniziale della testina</strong>. Puoi confrontare fino a 5 macchine sullo stesso nastro iniziale.</p>
+  <p>La colonna <strong>Posizione iniziale</strong> mostra da quale cella parte ciascuna macchina.</p>
+
+  <h3>7. Salvataggio e caricamento</h3>
+  <p><strong>Scarica progetto</strong> crea un file JSON con la configurazione della macchina. La posizione iniziale della testina viene salvata insieme alle transizioni, agli stati e all'alfabeto.</p>
+  <p>La stessa configurazione può essere caricata dal computer o salvata/caricata tramite GitHub.</p>
+
+  <h3>8. Un esempio completo</h3>
+  <p>Con alfabeto <code>X,Y,*</code>, stato <code>0</code> e istruzione <code>X,1,D</code> nella cella relativa a <code>0</code> e <code>*</code>, quando la testina incontra una casella vuota la macchina scrive <code>X</code>, passa allo stato <code>1</code> e si sposta di una posizione verso destra.</p>
+
+</div>
+  </div>
+
 </div>
 
+
+<!-- =========================================================
+     JAVASCRIPT ORIGINALE
+     ========================================================= -->
+
 <script>
-
-/*
-=========================================================
-PARTE 2
-Tutto il JavaScript si trova nel messaggio successivo.
-=========================================================
-*/
-
-/* =========================================================
-   PARTE 2A
-   MACCHINA + TABELLA + NASTRO + CONFRONTO
-   ========================================================= */
 
 "use strict";
 
 
 /* =========================================================
-   VARIABILI PRINCIPALI
+   PARTE CODICE
+   COSTANTI E STATO
    ========================================================= */
 
 const MAX_CONFRONTO = 5;
 const LIMITE_PASSAGGI = 1000000;
 
+const TOKEN_KEY =
+  "simulatore_turing_github_token";
+
+const CARTELLE_KEY =
+  "simulatore_turing_cartelle";
+
 let confronto = [];
 
+let cartellaCorrente = "";
+
+let indiceProgetti = null;
+
 let macchina = {
-  stato: "0",
-  posizione: 0,
-  turno: 0,
-  nastro: {},
-  inEsecuzione: false,
-  timer: null
+  stato:"0",
+  posizione:0,
+  posizioneIniziale:0,
+  turno:0,
+  nastro:{},
+  inEsecuzione:false,
+  timer:null,
+  offsetVisuale:0
 };
 
 
 /* =========================================================
-   FUNZIONI UTILI
+   PARTE CODICE
+   FUNZIONI GENERALI
    ========================================================= */
 
 function $(id){
@@ -405,9 +2776,21 @@ function splitLista(value){
 }
 
 
+function clone(value){
+
+  return JSON.parse(
+    JSON.stringify(value)
+  );
+
+}
+
+
 function contaIstruzioniProgetto(progetto){
 
-  if(!progetto || !progetto.transizioni){
+  if(
+    !progetto ||
+    !progetto.transizioni
+  ){
     return 0;
   }
 
@@ -417,11 +2800,517 @@ function contaIstruzioniProgetto(progetto){
 }
 
 
+function normalizzaPosizione(value){
+
+  const n =
+    Number(value);
+
+  if(!Number.isFinite(n)){
+    return 0;
+  }
+
+  return Math.floor(n);
+}
+
+
 /* =========================================================
-   PARSING DELLE TRANSIZIONI
+   TOKEN GITHUB
    ========================================================= */
 
-function analizzaTransizione(chiave,valore){
+function tokenSalvato(){
+
+  const token =
+    localStorage.getItem(
+      TOKEN_KEY
+    );
+
+  return !!(
+    token &&
+    token.trim()
+  );
+
+}
+
+
+function tokenGit(){
+
+  let token =
+    localStorage.getItem(
+      TOKEN_KEY
+    );
+
+  if(token){
+    return token.trim();
+  }
+
+  token =
+    prompt(
+      "Inserisci il token GitHub:"
+    );
+
+  if(token === null){
+    return "";
+  }
+
+  token =
+    token.trim();
+
+  if(!token){
+
+    alert(
+      "Token non inserito."
+    );
+
+    return "";
+  }
+
+  localStorage.setItem(
+    TOKEN_KEY,
+    token
+  );
+
+  return token;
+}
+
+
+function dimenticaToken(){
+
+  localStorage.removeItem(
+    TOKEN_KEY
+  );
+
+  $("gitMsg").textContent =
+    "Token eliminato dal browser.";
+
+  aggiornaPermessiCartelle();
+
+  alert(
+    "Token eliminato.\n\n" +
+    "Al prossimo salvataggio verrà " +
+    "richiesto nuovamente."
+  );
+}
+
+
+/* =========================================================
+   CONFIGURAZIONE MACCHINA
+   ========================================================= */
+
+function configurazioneCorrente(){
+
+  const transizioni = {};
+
+  $("tab")
+    .querySelectorAll(
+      "input[data-transition]"
+    )
+    .forEach(input => {
+
+      transizioni[
+        input.dataset.transition
+      ] =
+        input.value.trim();
+
+    });
+
+  return {
+
+    nome:"",
+
+    stato:
+      $("statoS").value.trim() ||
+      "0",
+
+    alfabeto:
+      splitLista(
+        $("alf").value
+      ),
+
+    stati:
+      splitLista(
+        $("stati").value
+      ),
+
+    transizioni:
+      transizioni,
+
+    posizioneIniziale:
+      normalizzaPosizione(
+        macchina.posizioneIniziale
+      )
+
+  };
+}
+
+
+function applicaConfigurazione(progetto){
+
+  if(
+    !progetto ||
+    typeof progetto !== "object" ||
+    Array.isArray(progetto)
+  ){
+
+    throw Error(
+      "Il file non contiene un progetto di Macchina di Turing valido."
+    );
+  }
+
+  const stato =
+    typeof progetto.stato === "string"
+      ? progetto.stato.trim()
+      : String(
+          progetto.stato ??
+          "0"
+        ).trim();
+
+  const alfabeto =
+    Array.isArray(progetto.alfabeto)
+      ? progetto.alfabeto
+          .map(x => String(x).trim())
+          .filter(x => x !== "")
+      : [];
+
+  const stati =
+    Array.isArray(progetto.stati)
+      ? progetto.stati
+          .map(x => String(x).trim())
+          .filter(x => x !== "")
+      : [];
+
+  if(
+    alfabeto.length === 0
+  ){
+
+    throw Error(
+      "Il progetto non contiene un alfabeto valido."
+    );
+  }
+
+  if(
+    stati.length === 0
+  ){
+
+    throw Error(
+      "Il progetto non contiene gli stati della macchina."
+    );
+  }
+
+  let transizioni =
+    progetto.transizioni;
+
+  if(
+    !transizioni ||
+    typeof transizioni !== "object" ||
+    Array.isArray(transizioni)
+  ){
+
+    transizioni = {};
+  }
+
+  const posizione =
+    normalizzaPosizione(
+      progetto.posizioneIniziale ??
+      progetto.posizione ??
+      0
+    );
+
+  $("statoS").value =
+    stato ||
+    stati[0] ||
+    "0";
+
+  $("alf").value =
+    alfabeto.join(",");
+
+  $("stati").value =
+    stati.join(",");
+
+  macchina.posizioneIniziale =
+    posizione;
+
+  genera();
+
+  const inputs =
+    $("tab")
+      .querySelectorAll(
+        "input[data-transition]"
+      );
+
+  let transizioniCaricate =
+    0;
+
+  inputs.forEach(
+    function(input){
+
+      const chiave =
+        input.dataset.transition;
+
+      if(
+        Object.prototype.hasOwnProperty.call(
+          transizioni,
+          chiave
+        )
+      ){
+
+        input.value =
+          String(
+            transizioni[chiave] ?? ""
+          );
+
+        transizioniCaricate++;
+
+      }
+
+    }
+  );
+
+  reset();
+
+  $("msg").textContent =
+    "Macchina caricata correttamente.";
+
+  $("err").textContent =
+    "";
+
+  console.log(
+    "Progetto caricato:",
+    {
+      nome:
+        progetto.nome || "",
+      stato:
+        stato,
+      alfabeto:
+        alfabeto,
+      stati:
+        stati,
+      transizioni:
+        transizioniCaricate,
+      posizioneIniziale:
+        posizione
+    }
+  );
+}
+
+
+function creaProgetto(){
+
+  return configurazioneCorrente();
+
+}
+
+
+/* =========================================================
+   GENERAZIONE TABELLA
+   ========================================================= */
+
+function genera(){
+
+  ferma();
+
+  const stati =
+    splitLista(
+      $("stati").value
+    );
+
+  const alfabeto =
+    splitLista(
+      $("alf").value
+    );
+
+  if(!stati.length){
+
+    $("err").textContent =
+      "Inserisci almeno uno stato.";
+
+    $("tab").innerHTML =
+      "";
+
+    return;
+  }
+
+  if(!alfabeto.length){
+
+    $("err").textContent =
+      "Inserisci almeno un simbolo.";
+
+    $("tab").innerHTML =
+      "";
+
+    return;
+  }
+
+  $("err").textContent =
+    "";
+
+  const vecchi = {};
+
+  $("tab")
+    .querySelectorAll(
+      "input[data-transition]"
+    )
+    .forEach(input => {
+
+      vecchi[
+        input.dataset.transition
+      ] =
+        input.value;
+
+    });
+
+  let html =
+    "<table><thead><tr>";
+
+  html +=
+    "<th>Stato \\ Simbolo</th>";
+
+  alfabeto.forEach(simbolo => {
+
+    html +=
+      "<th>" +
+      escapeHtml(simbolo) +
+      "</th>";
+
+  });
+
+  html +=
+    "</tr></thead><tbody>";
+
+  const statiTabella = [...stati];
+
+  if(!statiTabella.some(stato => stato.toLowerCase() === "fine")){
+    statiTabella.push("fine");
+  }
+
+  statiTabella.forEach(stato => {
+
+    html +=
+      "<tr>" +
+      "<th>" +
+      escapeHtml(stato) +
+      "</th>";
+
+    alfabeto.forEach(simbolo => {
+
+      const chiave =
+        stato +
+        "|" +
+        simbolo;
+
+      const valore =
+        Object.prototype.hasOwnProperty.call(
+          vecchi,
+          chiave
+        )
+          ? vecchi[chiave]
+          : "";
+
+      html +=
+        "<td>" +
+        "<input " +
+        "data-transition=\"" +
+        escapeHtml(chiave) +
+        "\" " +
+        "value=\"" +
+        escapeHtml(valore) +
+        "\" " +
+        "placeholder=\"X,1,D\">" +
+        "</td>";
+
+    });
+
+    html +=
+      "</tr>";
+
+  });
+
+  html +=
+    "</tbody></table>";
+
+  $("tab").innerHTML =
+    html;
+
+  reset();
+}
+
+
+function pulisciTabella(){
+
+  const inputs =
+    $("tab")
+      .querySelectorAll(
+        "input[data-transition]"
+      );
+
+  inputs.forEach(input => {
+
+    input.value = "";
+
+  });
+
+  $("err").textContent =
+    "";
+
+  $("msg").textContent =
+    "Tabella pulita.";
+}
+
+
+/* =========================================================
+   LETTURA TRANSIZIONI
+   ========================================================= */
+
+function validaTransizioni(){
+
+  const alfabeto = splitLista($("alf").value);
+  const stati = splitLista($("stati").value);
+  const statiValidi = new Set(
+    stati.concat(["fine"]).map(x => x.toLowerCase())
+  );
+  const errori = [];
+
+  $("tab").querySelectorAll("input[data-transition]").forEach(input => {
+
+    const valore = input.value.trim();
+    if(!valore) return;
+
+    const parti = valore.split(",").map(x => x.trim());
+    const [simbolo, statoSuccessivo, movimento] = parti;
+    const chiave = input.dataset.transition || "";
+    const statoCorrente = chiave.split("|")[0] || "?";
+
+    if(parti.length !== 3){
+      errori.push(`${statoCorrente}: formato non valido. Usa simbolo,stato,S/D.`);
+      return;
+    }
+
+    if(!alfabeto.includes(simbolo)){
+      errori.push(`${statoCorrente}: il simbolo scritto "${simbolo}" non appartiene all'alfabeto.`);
+    }
+
+    if(!statiValidi.has(statoSuccessivo.toLowerCase())){
+      errori.push(`${statoCorrente}: lo stato successivo "${statoSuccessivo}" non è definito.`);
+    }
+
+    if(movimento.toUpperCase() !== "S" && movimento.toUpperCase() !== "D"){
+      errori.push(`${statoCorrente}: lo spostamento deve essere S oppure D.`);
+    }
+  });
+
+  if(errori.length){
+    $("err").textContent = errori.slice(0,5).join(" ");
+    return false;
+  }
+
+  $("err").textContent = "";
+  return true;
+}
+
+
+function analizzaTransizione(
+  chiave,
+  valore
+){
 
   const partiChiave =
     String(chiave)
@@ -459,7 +3348,11 @@ function analizzaTransizione(chiave,valore){
     return null;
   }
 
-  if(d !== "S" && d !== "D"){
+  if(
+    d !== "S" &&
+    d !== "D"
+  ){
+
     return null;
   }
 
@@ -473,313 +3366,12 @@ function analizzaTransizione(chiave,valore){
 }
 
 
-/* =========================================================
-   CONFIGURAZIONE CORRENTE
-   ========================================================= */
-
-function configurazioneCorrente(){
-
-  const transizioni = {};
-
-  const inputs =
-    $("tab").querySelectorAll(
-      "input[data-transition]"
-    );
-
-  inputs.forEach(input => {
-
-    const chiave =
-      input.dataset.transition;
-
-    transizioni[chiave] =
-      input.value.trim();
-
-  });
-
-
-  return {
-
-    nome:"",
-    stato:
-      $("statoS").value.trim() || "0",
-
-    alfabeto:
-      splitLista(
-        $("alf").value
-      ),
-
-    stati:
-      splitLista(
-        $("stati").value
-      ),
-
-    transizioni:
-      transizioni
-
-  };
-}
-
-
-/* =========================================================
-   APPLICA CONFIGURAZIONE
-   ========================================================= */
-
-function applicaConfigurazione(progetto){
-
-  if(!progetto){
-    return;
-  }
-
-
-  $("statoS").value =
-    progetto.stato ||
-    "0";
-
-
-  $("alf").value =
-    Array.isArray(progetto.alfabeto)
-      ? progetto.alfabeto.join(",")
-      : "X,Y,*";
-
-
-  $("stati").value =
-    Array.isArray(progetto.stati)
-      ? progetto.stati.join(",")
-      : "0,1,2,3,4";
-
-
-  genera();
-
-
-  const transizioni =
-    progetto.transizioni || {};
-
-
-  Object.keys(transizioni)
-    .forEach(chiave => {
-
-      const input =
-        $("tab").querySelector(
-          'input[data-transition="' +
-          cssEscape(chiave) +
-          '"]'
-        );
-
-      if(input){
-        input.value =
-          transizioni[chiave];
-      }
-
-    });
-
-
-  reset();
-
-}
-
-
-/* =========================================================
-   ESCAPE PER SELECTOR CSS
-   ========================================================= */
-
-function cssEscape(value){
-
-  if(
-    window.CSS &&
-    typeof window.CSS.escape === "function"
-  ){
-
-    return window.CSS.escape(
-      String(value)
-    );
-
-  }
-
-  return String(value)
-    .replace(
-      /([^\w-])/g,
-      "\\$1"
-    );
-}
-
-
-/* =========================================================
-   GENERAZIONE TABELLA
-   ========================================================= */
-
-function genera(){
-
-  ferma();
-
-
-  const stati =
-    splitLista(
-      $("stati").value
-    );
-
-
-  const alfabeto =
-    splitLista(
-      $("alf").value
-    );
-
-
-  if(!stati.length){
-
-    $("err").textContent =
-      "Inserisci almeno uno stato.";
-
-    $("tab").innerHTML =
-      "";
-
-    return;
-
-  }
-
-
-  if(!alfabeto.length){
-
-    $("err").textContent =
-      "Inserisci almeno un simbolo.";
-
-    $("tab").innerHTML =
-      "";
-
-    return;
-
-  }
-
-
-  $("err").textContent =
-    "";
-
-
-  const vecchi = {};
-
-
-  $("tab")
-    .querySelectorAll(
-      "input[data-transition]"
-    )
-    .forEach(input => {
-
-      vecchi[
-        input.dataset.transition
-      ] =
-        input.value;
-
-    });
-
-
-  let html =
-    "<table><thead><tr>";
-
-  html +=
-    "<th>Stato \\ Simbolo</th>";
-
-
-  alfabeto.forEach(simbolo => {
-
-    html +=
-      "<th>" +
-      escapeHtml(simbolo) +
-      "</th>";
-
-  });
-
-
-  html +=
-    "</tr></thead><tbody>";
-
-
-  stati.forEach(stato => {
-
-    html +=
-      "<tr>" +
-      "<th>" +
-      escapeHtml(stato) +
-      "</th>";
-
-
-    alfabeto.forEach(simbolo => {
-
-      const chiave =
-        stato +
-        "|" +
-        simbolo;
-
-
-      const valore =
-        Object.prototype.hasOwnProperty.call(
-          vecchi,
-          chiave
-        )
-          ? vecchi[chiave]
-          : "";
-
-
-      html +=
-        "<td>" +
-        "<input " +
-        "data-transition=\"" +
-        escapeHtml(chiave) +
-        "\" " +
-        "value=\"" +
-        escapeHtml(valore) +
-        "\" " +
-        "placeholder=\"X,1,D\">" +
-        "</td>";
-
-    });
-
-
-    html +=
-      "</tr>";
-
-  });
-
-
-  html +=
-    "</tbody></table>";
-
-
-  $("tab").innerHTML =
-    html;
-
-
-  reset();
-
-}
-
-function pulisciTabella(){
-
-  const inputs =
-    $("tab").querySelectorAll(
-      "input[data-transition]"
-    );
-
-  inputs.forEach(input => {
-    input.value = "";
-  });
-
-  $("err").textContent = "";
-
-  $("msg").textContent =
-    "Tabella pulita.";
-
-}
-/* =========================================================
-   LETTURA DELLE REGOLE
-   ========================================================= */
-
 function leggiRegole(){
 
   const progetto =
     configurazioneCorrente();
 
-
   const regole = [];
-
 
   Object.keys(
     progetto.transizioni
@@ -791,25 +3383,15 @@ function leggiRegole(){
         progetto.transizioni[chiave]
       );
 
-
     if(regola){
-
-      regole.push(
-        regola
-      );
-
+      regole.push(regola);
     }
 
   });
 
-
   return regole;
 }
 
-
-/* =========================================================
-   TROVA REGOLA
-   ========================================================= */
 
 function trovaRegola(){
 
@@ -823,16 +3405,13 @@ function trovaRegola(){
         ]
       : "";
 
-
   const simboloRicerca =
     simbolo === ""
       ? "*"
       : simbolo;
 
-
   const regole =
     leggiRegole();
-
 
   return regole.find(
     regola =>
@@ -843,31 +3422,53 @@ function trovaRegola(){
 
 
 /* =========================================================
-   DISEGNO DEL NASTRO
+   NASTRO E TESTINA
    ========================================================= */
+
+function costruisciNastroDaStringa(
+  stringa
+){
+
+  const tape = {};
+
+  [...String(stringa || "")]
+    .forEach(
+      (simbolo,indice) => {
+
+        tape[indice] =
+          simbolo;
+
+      }
+    );
+
+  return tape;
+}
+
+
+function posizioneMinimaVisibile(){
+
+  return macchina.posizione +
+    macchina.offsetVisuale;
+}
+
 
 function disegnaNastro(){
 
   const tape =
     $("tape");
 
-
   tape.innerHTML =
     "";
-
-
-  const centro =
-    macchina.posizione;
-
 
   const celle =
     15;
 
+  const centro =
+    maquinaVisualCenter();
 
   const inizio =
     centro -
     Math.floor(celle / 2);
-
 
   for(
     let i=0;
@@ -878,27 +3479,13 @@ function disegnaNastro(){
     const posizione =
       inizio + i;
 
-
     const cell =
       document.createElement(
         "div"
       );
 
-
     cell.className =
       "cell";
-
-
-    /*
-     * IMPORTANTE:
-     *
-     * Una posizione mai utilizzata
-     * rimane visivamente bianca.
-     *
-     * Se invece la macchina ha scritto
-     * realmente "*" nella posizione,
-     * viene mostrato "*".
-     */
 
     if(
       Object.prototype.hasOwnProperty.call(
@@ -919,7 +3506,6 @@ function disegnaNastro(){
 
     }
 
-
     if(
       posizione ===
       macchina.posizione
@@ -931,6 +3517,16 @@ function disegnaNastro(){
 
     }
 
+    cell.addEventListener(
+      "dblclick",
+      function(){
+
+        impostaPosizioneTestina(
+          posizione
+        );
+
+      }
+    );
 
     tape.appendChild(
       cell
@@ -938,79 +3534,112 @@ function disegnaNastro(){
 
   }
 
-
   $("turno").textContent =
     macchina.turno;
-
 
   $("bubble").textContent =
     macchina.stato;
 
+  $("posizioneTestina").textContent =
+    macchina.posizione;
+
 }
 
 
-/* =========================================================
-   RESET
-   ========================================================= */
+function maquinaVisualCenter(){
+
+  return macchina.posizione +
+    macchina.offsetVisuale;
+}
+
+
+function impostaPosizioneTestina(
+  posizione
+){
+
+  const nuovaPosizione =
+    Number(posizione);
+
+  if(
+    !Number.isFinite(
+      nuovaPosizione
+    )
+  ){
+    return;
+  }
+
+  macchina.posizione =
+    Math.floor(
+      nuovaPosizione
+    );
+
+  macchina.posizioneIniziale =
+    macchina.posizione;
+
+  macchina.offsetVisuale =
+    0;
+
+  disegnaNastro();
+
+  $("msg").textContent =
+    "Testina spostata alla posizione " +
+    macchina.posizione +
+    ".";
+
+}
+
+
+function scrollTape(delta){
+
+  const valore =
+    Number(delta);
+
+  if(
+    !Number.isFinite(valore)
+  ){
+    return;
+  }
+
+  macchina.offsetVisuale +=
+    Math.floor(valore);
+
+  disegnaNastro();
+
+}
+
 
 function reset(){
 
   ferma();
 
-
   macchina.stato =
     $("statoS").value.trim() ||
     "0";
 
-
   macchina.posizione =
-    0;
-
+    normalizzaPosizione(
+      macchina.posizioneIniziale
+    );
 
   macchina.turno =
     0;
 
-
   macchina.nastro =
-    {};
-
-
-  const iniziale =
-    $("nastro").value;
-
-
-  /*
-   * Il nastro iniziale è composto
-   * esattamente dai caratteri inseriti.
-   *
-   * Una stringa vuota significa
-   * casella bianca.
-   */
-
-  [...String(iniziale)]
-    .forEach(
-      (simbolo,indice) => {
-
-        macchina.nastro[
-          indice
-        ] =
-          simbolo;
-
-      }
+    costruisciNastroDaStringa(
+      $("nastro").value
     );
-
 
   macchina.inEsecuzione =
     false;
 
+  macchina.offsetVisuale =
+    0;
 
   $("msg").textContent =
     "Pronto";
 
-
   $("err").textContent =
     "";
-
 
   disegnaNastro();
 
@@ -1018,7 +3647,7 @@ function reset(){
 
 
 /* =========================================================
-   ESEGUI UN PASSO
+   ESECUZIONE
    ========================================================= */
 
 function passo(){
@@ -1034,13 +3663,10 @@ function passo(){
     ferma();
 
     return;
-
   }
-
 
   const regola =
     trovaRegola();
-
 
   if(!regola){
 
@@ -1050,33 +3676,19 @@ function passo(){
     ferma();
 
     return;
-
   }
-
-
-  /*
-   * Scrittura.
-   */
 
   macchina.nastro[
     macchina.posizione
   ] =
     regola.w;
 
-
-  /*
-   * Cambio stato.
-   */
-
   macchina.stato =
     regola.n;
 
-
-  /*
-   * Movimento.
-   */
-
-  if(regola.d === "D"){
+  if(
+    regola.d === "D"
+  ){
 
     macchina.posizione++;
 
@@ -1086,17 +3698,12 @@ function passo(){
 
   }
 
-
-  /*
-   * Il turno aumenta anche
-   * quando si entra in FINE.
-   */
-
   macchina.turno++;
 
+  macchina.offsetVisuale =
+    0;
 
   disegnaNastro();
-
 
   if(
     macchina.stato.toLowerCase() ===
@@ -1110,22 +3717,20 @@ function passo(){
     ferma();
 
     return;
-
   }
-
 
   $("msg").textContent =
     "Passaggio " +
     macchina.turno;
-
 }
 
 
-/* =========================================================
-   AVVIA ESECUZIONE AUTOMATICA
-   ========================================================= */
-
 function avvia(){
+
+  if(!validaTransizioni()){
+    ferma();
+    return;
+  }
 
   if(macchina.inEsecuzione){
     return;
@@ -1134,20 +3739,19 @@ function avvia(){
   const velocita =
     $("velocita").value;
 
-  /*
-   * Esecuzione immediata:
-   * tutti i passaggi vengono eseguiti
-   * senza animazione.
-   */
+  if(
+    velocita ===
+    "illimitato"
+  ){
 
-  if(velocita === "illimitato"){
-
-    macchina.inEsecuzione = true;
+    macchina.inEsecuzione =
+      true;
 
     $("msg").textContent =
       "Esecuzione...";
 
-    let contatore = 0;
+    let contatore =
+      0;
 
     while(
       macchina.inEsecuzione &&
@@ -1161,18 +3765,11 @@ function avvia(){
 
       contatore++;
 
-      /*
-       * Se passo() ha fermato la macchina,
-       * abbiamo raggiunto la fine.
-       */
-
-      if(!macchina.inEsecuzione){
+      if(
+        !macchina.inEsecuzione
+      ){
         break;
       }
-
-      /*
-       * Sicurezza aggiuntiva.
-       */
 
       if(
         macchina.turno ===
@@ -1207,40 +3804,34 @@ function avvia(){
     return;
   }
 
-
-  /*
-   * Modalità con velocità scelta.
-   */
-
   const azioniSecondo =
     Number(velocita);
 
   if(
-    !Number.isFinite(azioniSecondo) ||
+    !Number.isFinite(
+      azioniSecondo
+    ) ||
     azioniSecondo <= 0
   ){
 
     return;
   }
 
-
   const intervallo =
-    1000 / azioniSecondo;
-
+    1000 /
+    azioniSecondo;
 
   macchina.inEsecuzione =
     true;
-
 
   $("msg").textContent =
     "Macchina in esecuzione: " +
     azioniSecondo +
     " azioni/s";
 
-
   macchina.timer =
     setInterval(
-      () => {
+      function(){
 
         if(
           !macchina.inEsecuzione
@@ -1253,23 +3844,17 @@ function avvia(){
       },
       intervallo
     );
-
 }
 
-
-
-/* =========================================================
-   FERMA
-   ========================================================= */
 
 function ferma(){
 
   macchina.inEsecuzione =
     false;
 
-
   if(
-    macchina.timer !== null
+    macchina.timer !==
+    null
   ){
 
     clearInterval(
@@ -1278,24 +3863,7 @@ function ferma(){
 
     macchina.timer =
       null;
-
   }
-
-}
-
-
-/* =========================================================
-   SCORRIMENTO VISIVO DEL NASTRO
-   ========================================================= */
-
-function scrollTape(delta){
-
-  macchina.posizione +=
-    Number(delta) || 0;
-
-
-  disegnaNastro();
-
 }
 
 
@@ -1327,6 +3895,10 @@ function apriProgetti(){
     .classList
     .add("open");
 
+  aggiornaPermessiCartelle();
+
+  listaGit();
+
 }
 
 
@@ -1345,6 +3917,10 @@ function chiudiProgetti(){
 
 function aggiungiConfronto(){
 
+  if(!validaTransizioni()){
+    return;
+  }
+
   if(
     confronto.length >=
     MAX_CONFRONTO
@@ -1357,18 +3933,14 @@ function aggiungiConfronto(){
     );
 
     return;
-
   }
-
 
   const progetto =
     configurazioneCorrente();
 
-
   const nomeSuggerito =
     "Macchina " +
     (confronto.length + 1);
-
 
   let nome =
     prompt(
@@ -1376,77 +3948,51 @@ function aggiungiConfronto(){
       nomeSuggerito
     );
 
-
   if(nome === null){
-
     return;
-
   }
-
 
   nome =
     nome.trim();
 
-
   if(!nome){
-
     nome =
       nomeSuggerito;
-
   }
-
 
   confronto.push({
 
-    nome:
-      nome,
+    nome:nome,
 
     progetto:
-      JSON.parse(
-        JSON.stringify(
-          progetto
-        )
-      ),
+      clone(progetto),
 
-    risultato:
-      "",
+    risultato:"",
 
-    passaggi:
-      0,
+    passaggi:0,
 
-    statoFinale:
-      "",
+    statoFinale:"",
 
-    motivo:
-      ""
+    motivo:""
 
   });
 
-
   renderConfronto();
-
 
   $("msg").textContent =
     '"' +
     nome +
     '" aggiunta al confronto.';
-
 }
 
-
-/* =========================================================
-   RENDER CONFRONTO
-   ========================================================= */
 
 function renderConfronto(){
 
   const corpo =
     $("corpoConfronto");
 
-
   corpo.innerHTML =
     "";
-
 
   if(
     confronto.length === 0
@@ -1456,40 +4002,32 @@ function renderConfronto(){
       .style.display =
       "block";
 
-
     $("tabConfronto")
       .style.display =
       "none";
 
-
     return;
-
   }
-
 
   $("confrontoVuoto")
     .style.display =
     "none";
 
-
   $("tabConfronto")
     .style.display =
     "table";
 
-
   confronto.forEach(
-    (item,indice) => {
+    function(item,indice){
 
       const progetto =
         item.progetto ||
         {};
 
-
       const istruzioni =
         contaIstruzioniProgetto(
           progetto
         );
-
 
       const stati =
         Array.isArray(
@@ -1498,57 +4036,134 @@ function renderConfronto(){
           ? progetto.stati.length
           : 0;
 
+      const posizione =
+        normalizzaPosizione(
+          progetto.posizioneIniziale ??
+          progetto.posizione ??
+          0
+        );
 
       const tr =
         document.createElement(
           "tr"
         );
 
+      const tdNome =
+        document.createElement(
+          "td"
+        );
 
-      tr.innerHTML =
+      tdNome.className =
+        "nomeConfronto";
 
-        "<td class=\"nomeConfronto\">" +
-        escapeHtml(
-          item.nome
-        ) +
-        "</td>" +
+      tdNome.textContent =
+        item.nome;
 
-        "<td class=\"risultatoConfronto\">" +
-        escapeHtml(
-          item.risultato || "—"
-        ) +
-        "</td>" +
+      const tdPosizione =
+        document.createElement(
+          "td"
+        );
 
-        "<td>" +
-        escapeHtml(
-          item.passaggi
-        ) +
-        "</td>" +
+      tdPosizione.textContent =
+        posizione;
 
-        "<td>" +
-        escapeHtml(
-          istruzioni
-        ) +
-        "</td>" +
+      const tdRisultato =
+        document.createElement(
+          "td"
+        );
 
-        "<td>" +
-        escapeHtml(
-          stati
-        ) +
-        "</td>" +
+      tdRisultato.className =
+        "risultatoConfronto";
 
-        "<td class=\"confrontoAzioni\">" +
+      tdRisultato.textContent =
+        item.risultato ||
+        "—";
 
-        "<button onclick=\"modificaConfronto(" +
-        indice +
-        ")\">Modifica</button>" +
+      const tdPassaggi =
+        document.createElement(
+          "td"
+        );
 
-        "<button onclick=\"eliminaConfronto(" +
-        indice +
-        ")\">Elimina</button>" +
+      tdPassaggi.textContent =
+        item.passaggi;
 
-        "</td>";
+      const tdIstruzioni =
+        document.createElement(
+          "td"
+        );
 
+      tdIstruzioni.textContent =
+        istruzioni;
+
+      const tdStati =
+        document.createElement(
+          "td"
+        );
+
+      tdStati.textContent =
+        stati;
+
+      const tdAzioni =
+        document.createElement(
+          "td"
+        );
+
+      tdAzioni.className =
+        "confrontoAzioni";
+
+      const btnModifica =
+        document.createElement(
+          "button"
+        );
+
+      btnModifica.textContent =
+        "Modifica";
+
+      btnModifica.addEventListener(
+        "click",
+        function(){
+
+          modificaConfronto(
+            indice
+          );
+
+        }
+      );
+
+      const btnElimina =
+        document.createElement(
+          "button"
+        );
+
+      btnElimina.textContent =
+        "Elimina";
+
+      btnElimina.addEventListener(
+        "click",
+        function(){
+
+          eliminaConfronto(
+            indice
+          );
+
+        }
+      );
+
+      tdAzioni.appendChild(
+        btnModifica
+      );
+
+      tdAzioni.appendChild(
+        btnElimina
+      );
+
+      tr.appendChild(tdNome);
+      tr.appendChild(tdPosizione);
+      tr.appendChild(tdRisultato);
+      tr.appendChild(tdPassaggi);
+      tr.appendChild(tdIstruzioni);
+      tr.appendChild(tdStati);
+      tr.appendChild(tdAzioni);
 
       corpo.appendChild(
         tr
@@ -1556,107 +4171,62 @@ function renderConfronto(){
 
     }
   );
-
 }
 
-
-/* =========================================================
-   MODIFICA DAL CONFRONTO
-   ========================================================= */
 
 function modificaConfronto(indice){
 
   const item =
     confronto[indice];
 
-
   if(!item){
     return;
   }
-
-
-  /*
-   * UN SOLO MESSAGGIO.
-   */
 
   const ok =
     confirm(
       'La voce "' +
       item.nome +
       '" verrà eliminata dal confronto.\n\n' +
-
-      "Ciò che è scritto nella tabella " +
-      "principale verrà cancellato e " +
-      "sostituito con il codice di questa macchina.\n\n" +
-
+      "La macchina verrà riportata nella griglia principale.\n\n" +
       "Vuoi continuare?"
     );
-
 
   if(!ok){
     return;
   }
 
-
-  /*
-   * Salviamo una copia prima
-   * di eliminare la voce.
-   */
-
   const progetto =
-    JSON.parse(
-      JSON.stringify(
-        item.progetto
-      )
+    clone(
+      item.progetto
     );
-
-
-  /*
-   * La macchina viene realmente
-   * tolta dal confronto.
-   */
 
   confronto.splice(
     indice,
     1
   );
 
-
-  /*
-   * Il codice della macchina
-   * viene riportato nella griglia.
-   */
-
   applicaConfigurazione(
     progetto
   );
 
-
   renderConfronto();
-
 
   $("msg").textContent =
     'La macchina "' +
     item.nome +
     '" è stata riportata nella griglia.';
-
 }
 
-
-/* =========================================================
-   ELIMINA DAL CONFRONTO
-   ========================================================= */
 
 function eliminaConfronto(indice){
 
   const item =
     confronto[indice];
 
-
   if(!item){
     return;
   }
-
 
   if(
     !confirm(
@@ -1665,70 +4235,51 @@ function eliminaConfronto(indice){
       '" dal confronto?'
     )
   ){
-
     return;
-
   }
-
 
   confronto.splice(
     indice,
     1
   );
 
-
   renderConfronto();
-
 
   $("msg").textContent =
     'La macchina "' +
     item.nome +
     '" è stata eliminata.';
-
 }
 
-
-/* =========================================================
-   SVUOTA CONFRONTO
-   ========================================================= */
 
 function svuotaConfronto(){
 
   if(
     confronto.length === 0
   ){
-
     return;
-
   }
-
 
   if(
     !confirm(
       "Vuoi eliminare tutte le macchine dal confronto?"
     )
   ){
-
     return;
-
   }
-
 
   confronto =
     [];
 
-
   renderConfronto();
-
 
   $("msg").textContent =
     "Confronto svuotato.";
-
 }
 
 
 /* =========================================================
-   ESECUZIONE DI UNA MACCHINA DEL CONFRONTO
+   ESECUZIONE CONFRONTO
    ========================================================= */
 
 function eseguiMacchina(
@@ -1740,48 +4291,32 @@ function eseguiMacchina(
     progetto.transizioni ||
     {};
 
-
-  const regole =
-    [];
-
+  const regole = [];
 
   Object.keys(
     transizioni
-  ).forEach(chiave => {
+  ).forEach(
+    function(chiave){
 
-    const regola =
-      analizzaTransizione(
-        chiave,
-        transizioni[chiave]
-      );
+      const regola =
+        analizzaTransizione(
+          chiave,
+          transizioni[chiave]
+        );
 
-
-    if(regola){
-
-      regole.push(
-        regola
-      );
-
-    }
-
-  });
-
-
-  const tape =
-    {};
-
-
-  [...String(
-    nastroIniziale || ""
-  )].forEach(
-    (simbolo,indice) => {
-
-      tape[indice] =
-        simbolo;
+      if(regola){
+        regole.push(
+          regola
+        );
+      }
 
     }
   );
 
+  const tape =
+    costruisciNastroDaStringa(
+      nastroIniziale
+    );
 
   let stato =
     String(
@@ -1789,22 +4324,21 @@ function eseguiMacchina(
       "0"
     );
 
-
   let posizione =
-    0;
-
+    normalizzaPosizione(
+      progetto.posizioneIniziale ??
+      progetto.posizione ??
+      0
+    );
 
   let passaggi =
     0;
 
-
   let motivo =
     "";
 
-
   let terminata =
     false;
-
 
   while(
     passaggi <
@@ -1819,20 +4353,22 @@ function eseguiMacchina(
         ? tape[posizione]
         : "";
 
-
     const simboloRicerca =
       simbolo === ""
         ? "*"
         : simbolo;
 
-
     const regola =
       regole.find(
-        r =>
-          r.q === stato &&
-          r.r === simboloRicerca
-      );
+        function(r){
 
+          return (
+            r.q === stato &&
+            r.r === simboloRicerca
+          );
+
+        }
+      );
 
     if(!regola){
 
@@ -1843,19 +4379,17 @@ function eseguiMacchina(
         "nessuna transizione";
 
       break;
-
     }
-
 
     tape[posizione] =
       regola.w;
 
-
     stato =
       regola.n;
 
-
-    if(regola.d === "D"){
+    if(
+      regola.d === "D"
+    ){
 
       posizione++;
 
@@ -1865,9 +4399,7 @@ function eseguiMacchina(
 
     }
 
-
     passaggi++;
-
 
     if(
       stato.toLowerCase() ===
@@ -1881,11 +4413,9 @@ function eseguiMacchina(
         "fine";
 
       break;
-
     }
 
   }
-
 
   if(!terminata){
 
@@ -1893,36 +4423,32 @@ function eseguiMacchina(
       "limite di " +
       LIMITE_PASSAGGI +
       " passaggi";
-
   }
-
 
   const posizioni =
     Object.keys(tape)
-      .map(
-        Number
-      );
+      .map(Number);
 
+  posizioni.push(
+    0
+  );
 
-  posizioni.push(0);
-  posizioni.push(posizione);
-
+  posizioni.push(
+    posizione
+  );
 
   const min =
     Math.min(
       ...posizioni
     );
 
-
   const max =
     Math.max(
       ...posizioni
     );
 
-
   let risultato =
     "";
-
 
   for(
     let p=min;
@@ -1942,18 +4468,12 @@ function eseguiMacchina(
 
     }else{
 
-      /*
-       * Casella mai utilizzata:
-       * rimane bianca.
-       */
-
       risultato +=
         "";
 
     }
 
   }
-
 
   return {
 
@@ -1969,6 +4489,13 @@ function eseguiMacchina(
     posizioneFinale:
       posizione,
 
+    posizioneIniziale:
+      normalizzaPosizione(
+        progetto.posizioneIniziale ??
+        progetto.posizione ??
+        0
+      ),
+
     terminata:
       terminata,
 
@@ -1976,15 +4503,14 @@ function eseguiMacchina(
       motivo
 
   };
-
 }
 
 
-/* =========================================================
-   ESEGUI CONFRONTO
-   ========================================================= */
-
 function eseguiConfronto(){
+
+  if(!validaTransizioni()){
+    return;
+  }
 
   if(
     confronto.length === 0
@@ -1995,86 +4521,60 @@ function eseguiConfronto(){
     );
 
     return;
-
   }
-
 
   const nastro =
     $("confrontoNastro").value;
 
+  confronto.forEach(
+    function(item){
 
-  confronto.forEach(item => {
+      try{
 
-    try{
+        const risultato =
+          eseguiMacchina(
+            item.progetto,
+            nastro
+          );
 
-      const risultato =
-        eseguiMacchina(
-          item.progetto,
-          nastro
-        );
+        item.risultato =
+          risultato.risultato;
 
+        item.passaggi =
+          risultato.passaggi;
 
-      item.risultato =
-        risultato.risultato;
+        item.statoFinale =
+          risultato.statoFinale;
 
+        item.motivo =
+          risultato.motivo;
 
-      item.passaggi =
-        risultato.passaggi;
+      }catch(e){
 
+        item.risultato =
+          "ERRORE";
 
-      item.statoFinale =
-        risultato.statoFinale;
+        item.passaggi =
+          0;
 
+        item.statoFinale =
+          "";
 
-      item.motivo =
-        risultato.motivo;
+        item.motivo =
+          e.message ||
+          String(e);
 
-
-    }catch(e){
-
-      item.risultato =
-        "ERRORE";
-
-
-      item.passaggi =
-        0;
-
-
-      item.statoFinale =
-        "";
-
-
-      item.motivo =
-        e.message ||
-        String(e);
+      }
 
     }
-
-  });
-
+  );
 
   renderConfronto();
-
-}
-/* =========================================================
-   PARTE 2B
-   PROGETTI + GITHUB + INIZIALIZZAZIONE
-   ========================================================= */
-
-
-/* =========================================================
-   CREAZIONE PROGETTO
-   ========================================================= */
-
-function creaProgetto(){
-
-  return configurazioneCorrente();
-
 }
 
 
 /* =========================================================
-   SCARICA PROGETTO
+   DOWNLOAD PROGETTO
    ========================================================= */
 
 function scaricaProgetto(){
@@ -2087,53 +4587,40 @@ function scaricaProgetto(){
         "progetto"
       );
 
-
     if(nome === null){
-
       return;
-
     }
-
 
     nome =
       nome.trim();
 
-
     if(!nome){
-
       nome =
         "progetto";
-
     }
-
 
     const progetto =
       creaProgetto();
 
-
     progetto.nome =
       nome;
 
+    progetto.cartella =
+      cartellaCorrente;
 
     let file =
-      nome
-        .replace(
-          /[\\/:*?"<>|]+/g,
-          "_"
-        );
-
+      nome.replace(
+        /[\\/:*?"<>|]+/g,
+        "_"
+      );
 
     if(!file){
-
       file =
         "progetto";
-
     }
-
 
     file +=
       ".json";
-
 
     const blob =
       new Blob(
@@ -2150,40 +4637,32 @@ function scaricaProgetto(){
         }
       );
 
-
     const url =
       URL.createObjectURL(
         blob
       );
-
 
     const a =
       document.createElement(
         "a"
       );
 
-
     a.href =
       url;
 
-
     a.download =
       file;
-
 
     document.body.appendChild(
       a
     );
 
-
     a.click();
-
 
     a.remove();
 
-
     setTimeout(
-      () => {
+      function(){
 
         URL.revokeObjectURL(
           url
@@ -2192,7 +4671,6 @@ function scaricaProgetto(){
       },
       1000
     );
-
 
     $("gitMsg").textContent =
       "Progetto scaricato.";
@@ -2208,14 +4686,12 @@ function scaricaProgetto(){
         String(e)
       )
     );
-
   }
-
 }
 
 
 /* =========================================================
-   CARICA DA COMPUTER
+   CARICAMENTO DA COMPUTER
    ========================================================= */
 
 function caricaComputer(){
@@ -2228,14 +4704,20 @@ function caricaComputer(){
 function leggiFile(event){
 
   const file =
+    event.target.files &&
     event.target.files[0];
 
 
   if(!file){
 
     return;
-
   }
+
+
+  $("gitMsg").textContent =
+    "Lettura del file: " +
+    file.name +
+    "...";
 
 
   const reader =
@@ -2247,26 +4729,71 @@ function leggiFile(event){
 
       try{
 
-        const progetto =
-          JSON.parse(
-            reader.result
+        let testo =
+          String(
+            reader.result ?? ""
           );
 
 
-        /*
-         * Controllo minimo per evitare
-         * di caricare file completamente
-         * estranei.
-         */
+        testo =
+          testo.replace(
+            /^\uFEFF/,
+            ""
+          );
+
+
+        testo =
+          testo.trim();
+
+
+        if(!testo){
+
+          throw Error(
+            "Il file è vuoto."
+          );
+        }
+
+
+        let progetto;
+
+        try{
+
+          progetto =
+            JSON.parse(
+              testo
+            );
+
+        }catch(jsonError){
+
+          throw Error(
+            "Il file non contiene un JSON valido.\n\n" +
+            (
+              jsonError.message ||
+              String(jsonError)
+            )
+          );
+        }
+
 
         if(
           !progetto ||
-          typeof progetto !== "object"
+          typeof progetto !== "object" ||
+          Array.isArray(progetto)
         ){
 
           throw Error(
             "Il file non contiene un progetto valido."
           );
+        }
+
+
+        if(
+          progetto.posizioneIniziale === undefined &&
+          progetto.posizione !== undefined
+        ){
+
+          progetto.posizioneIniziale =
+            progetto.posizione;
 
         }
 
@@ -2277,16 +4804,40 @@ function leggiFile(event){
 
 
         $("gitMsg").textContent =
-          "Progetto caricato dal computer.";
+          "Progetto \"" +
+          (
+            progetto.nome ||
+            file.name
+          ) +
+          "\" caricato dal computer.";
 
 
         $("msg").textContent =
-          "Progetto caricato.";
+          "Macchina caricata.";
+
+
+        chiudiProgetti();
+
 
       }catch(e){
 
+        console.error(
+          "Errore caricamento progetto:",
+          e
+        );
+
+
+        $("gitMsg").textContent =
+          "Errore nel caricamento del progetto.";
+
+
+        $("err").textContent =
+          e.message ||
+          String(e);
+
+
         alert(
-          "File progetto non valido.\n\n" +
+          "Impossibile caricare il progetto.\n\n" +
           (
             e.message ||
             String(e)
@@ -2295,11 +4846,6 @@ function leggiFile(event){
 
       }
 
-
-      /*
-       * Permette di selezionare
-       * nuovamente lo stesso file.
-       */
 
       event.target.value =
         "";
@@ -2310,8 +4856,18 @@ function leggiFile(event){
   reader.onerror =
     function(){
 
+      console.error(
+        "Errore FileReader:",
+        reader.error
+      );
+
+
+      $("gitMsg").textContent =
+        "Errore nella lettura del file.";
+
+
       alert(
-        "Impossibile leggere il file."
+        "Impossibile leggere il file dal computer."
       );
 
 
@@ -2322,21 +4878,20 @@ function leggiFile(event){
 
 
   reader.readAsText(
-    file
+    file,
+    "UTF-8"
   );
-
 }
 
 
 /* =========================================================
-   INFORMAZIONI REPOSITORY GITHUB
+   INFORMAZIONI GITHUB
    ========================================================= */
 
 function ghInfo(){
 
   const hostname =
     location.hostname;
-
 
   if(
     !hostname.endsWith(
@@ -2347,13 +4902,10 @@ function ghInfo(){
     throw Error(
       "Questa pagina non sembra essere ospitata su GitHub Pages."
     );
-
   }
-
 
   const owner =
     hostname.split(".")[0];
-
 
   const parti =
     location.pathname
@@ -2361,7 +4913,6 @@ function ghInfo(){
       .filter(
         x => x
       );
-
 
   return {
 
@@ -2374,13 +4925,8 @@ function ghInfo(){
         : owner + ".github.io"
 
   };
-
 }
 
-
-/* =========================================================
-   BASE64
-   ========================================================= */
 
 function b64(testo){
 
@@ -2390,10 +4936,8 @@ function b64(testo){
         testo
       );
 
-
   let binario =
     "";
-
 
   for(
     const byte of bytes
@@ -2406,11 +4950,9 @@ function b64(testo){
 
   }
 
-
   return btoa(
     binario
   );
-
 }
 
 
@@ -2425,12 +4967,10 @@ function fromB64(testo){
         )
     );
 
-
   const bytes =
     new Uint8Array(
       binario.length
     );
-
 
   for(
     let i=0;
@@ -2443,95 +4983,10 @@ function fromB64(testo){
 
   }
 
-
   return new TextDecoder()
     .decode(
       bytes
     );
-
-}
-
-
-/* =========================================================
-   TOKEN GITHUB
-   ========================================================= */
-
-const TOKEN_KEY =
-  "simulatore_turing_github_token";
-
-
-function tokenGit(){
-
-  let token =
-    localStorage.getItem(
-      TOKEN_KEY
-    );
-
-
-  if(token){
-
-    return token.trim();
-
-  }
-
-
-  token =
-    prompt(
-      "Inserisci il token GitHub:"
-    );
-
-
-  if(token === null){
-
-    return "";
-
-  }
-
-
-  token =
-    token.trim();
-
-
-  if(!token){
-
-    alert(
-      "Token non inserito."
-    );
-
-
-    return "";
-
-  }
-
-
-  localStorage.setItem(
-    TOKEN_KEY,
-    token
-  );
-
-
-  return token;
-
-}
-
-
-function dimenticaToken(){
-
-  localStorage.removeItem(
-    TOKEN_KEY
-  );
-
-
-  $("gitMsg").textContent =
-    "Token eliminato dal browser.";
-
-
-  alert(
-    "Token eliminato.\n\n" +
-    "Al prossimo salvataggio verrà " +
-    "richiesto nuovamente."
-  );
-
 }
 
 
@@ -2547,7 +5002,6 @@ async function ghGet(
   const g =
     ghInfo();
 
-
   const url =
     "https://api.github.com/repos/" +
     encodeURIComponent(g.owner) +
@@ -2555,7 +5009,6 @@ async function ghGet(
     encodeURIComponent(g.repo) +
     "/contents/" +
     path;
-
 
   const response =
     await fetch(
@@ -2571,10 +5024,8 @@ async function ghGet(
             token
 
         }
-
       }
     );
-
 
   if(
     response.status ===
@@ -2582,28 +5033,23 @@ async function ghGet(
   ){
 
     return null;
-
   }
-
 
   if(!response.ok){
 
     let messaggio =
       "";
 
-
     try{
 
       const data =
         await response.json();
-
 
       messaggio =
         data.message ||
         "";
 
     }catch(e){}
-
 
     throw Error(
       "GitHub: " +
@@ -2612,12 +5058,9 @@ async function ghGet(
         response.status
       )
     );
-
   }
 
-
   return response.json();
-
 }
 
 
@@ -2636,7 +5079,6 @@ async function ghPut(
   const g =
     ghInfo();
 
-
   const url =
     "https://api.github.com/repos/" +
     encodeURIComponent(g.owner) +
@@ -2644,7 +5086,6 @@ async function ghPut(
     encodeURIComponent(g.repo) +
     "/contents/" +
     path;
-
 
   const body = {
 
@@ -2656,14 +5097,10 @@ async function ghPut(
 
   };
 
-
   if(sha){
-
     body.sha =
       sha;
-
   }
-
 
   const response =
     await fetch(
@@ -2698,25 +5135,21 @@ async function ghPut(
       }
     );
 
-
   if(!response.ok){
 
     let messaggioGitHub =
       "";
-
 
     try{
 
       const data =
         await response.json();
 
-
       messaggioGitHub =
         data.message ||
         "";
 
     }catch(e){}
-
 
     throw Error(
       "GitHub: " +
@@ -2725,17 +5158,617 @@ async function ghPut(
         response.status
       )
     );
-
   }
 
-
   return response.json();
-
 }
 
 
 /* =========================================================
-   LISTA PROGETTI GITHUB
+   SISTEMA CARTELLE
+   ========================================================= */
+
+function indiceVuoto(){
+
+  return {
+
+    version:2,
+
+    cartelle:[],
+
+    progetti:[]
+
+  };
+}
+
+
+function normalizzaIndice(data){
+
+  if(Array.isArray(data)){
+
+    return {
+
+      version:2,
+
+      cartelle:[],
+
+      progetti:
+        data.map(
+          function(file){
+
+            return {
+
+              file:
+                String(file),
+
+              nome:
+                String(file)
+                  .replace(
+                    /\.json$/i,
+                    ""
+                  ),
+
+              cartella:""
+
+            };
+
+          }
+        )
+
+    };
+  }
+
+  if(
+    !data ||
+    typeof data !== "object"
+  ){
+
+    return indiceVuoto();
+  }
+
+  const risultato =
+    indiceVuoto();
+
+  if(
+    Array.isArray(
+      data.cartelle
+    )
+  ){
+
+    risultato.cartelle =
+      data.cartelle
+        .filter(
+          function(c){
+
+            return (
+              c &&
+              typeof c === "object" &&
+              typeof c.id === "string" &&
+              typeof c.nome === "string"
+            );
+
+          }
+        )
+        .map(
+          function(c){
+
+            return {
+
+              id:c.id,
+
+              nome:c.nome,
+
+              parent:
+                typeof c.parent === "string"
+                  ? c.parent
+                  : ""
+
+            };
+
+          }
+        );
+
+  }
+
+  if(
+    Array.isArray(
+      data.progetti
+    )
+  ){
+
+    risultato.progetti =
+      data.progetti
+        .filter(
+          function(p){
+
+            return (
+              p &&
+              typeof p === "object" &&
+              typeof p.file === "string"
+            );
+
+          }
+        )
+        .map(
+          function(p){
+
+            return {
+
+              file:p.file,
+
+              nome:
+                typeof p.nome === "string"
+                  ? p.nome
+                  : p.file.replace(
+                      /\.json$/i,
+                      ""
+                    ),
+
+              cartella:
+                typeof p.cartella === "string"
+                  ? p.cartella
+                  : ""
+
+            };
+
+          }
+        );
+
+  }
+
+  if(
+    risultato.progetti.length === 0 &&
+    Array.isArray(data.files)
+  ){
+
+    risultato.progetti =
+      data.files.map(
+        function(file){
+
+          return {
+
+            file:String(file),
+
+            nome:
+              String(file)
+                .replace(
+                  /\.json$/i,
+                  ""
+                ),
+
+            cartella:""
+
+          };
+
+        }
+      );
+
+  }
+
+  return risultato;
+}
+
+
+function salvaIndiceLocale(){
+
+  try{
+
+    localStorage.setItem(
+      CARTELLE_KEY,
+      JSON.stringify(
+        indiceProgetti
+      )
+    );
+
+  }catch(e){
+
+    console.warn(
+      "Impossibile salvare l'indice locale.",
+      e
+    );
+
+  }
+
+}
+
+
+function caricaIndiceLocale(){
+
+  try{
+
+    const testo =
+      localStorage.getItem(
+        CARTELLE_KEY
+      );
+
+    if(!testo){
+      return null;
+    }
+
+    return normalizzaIndice(
+      JSON.parse(
+        testo
+      )
+    );
+
+  }catch(e){
+
+    return null;
+
+  }
+}
+
+
+function trovaCartella(
+  id
+){
+
+  if(!indiceProgetti){
+    return null;
+  }
+
+  return indiceProgetti.cartelle.find(
+    function(c){
+
+      return c.id === id;
+
+    }
+  ) || null;
+}
+
+
+function nomePercorsoCartella(){
+
+  if(
+    !cartellaCorrente
+  ){
+
+    return "Principale";
+  }
+
+  const parti = [];
+
+  let id =
+    cartellaCorrente;
+
+  let sicurezza =
+    0;
+
+  while(
+    id &&
+    sicurezza < 100
+  ){
+
+    const cartella =
+      trovaCartella(
+        id
+      );
+
+    if(!cartella){
+      break;
+    }
+
+    parti.unshift(
+      cartella.nome
+    );
+
+    id =
+      cartella.parent;
+
+    sicurezza++;
+  }
+
+  return parti.length
+    ? parti.join(" / ")
+    : "Principale";
+}
+
+
+function aggiornaPercorso(){
+
+  $("percorsoCartella").innerHTML =
+    '<svg class="iconaCartella" viewBox="0 0 24 24" aria-hidden="true">' +
+      '<path d="M3 6.5A2.5 2.5 0 0 1 5.5 4H10l2 2h6.5A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/>' +
+    '</svg>' +
+    '<span>' + nomePercorsoCartella() + '</span>';
+}
+
+
+function aggiornaPermessiCartelle(){
+
+  const abilitato =
+    tokenSalvato();
+
+  $("btnSpostaCartella").disabled =
+    !abilitato;
+
+  $("btnEliminaCartella").disabled =
+    !abilitato;
+
+  $("btnCreaCartella").disabled =
+    !abilitato;
+
+  aggiornaPercorso();
+}
+
+
+function generaIdCartella(){
+
+  return (
+    "cartella-" +
+    Date.now().toString(36) +
+    "-" +
+    Math.random()
+      .toString(36)
+      .slice(2,8)
+  );
+}
+
+
+function progettiNellaCartella(){
+
+  if(!indiceProgetti){
+    return [];
+  }
+
+  return indiceProgetti.progetti.filter(
+    function(p){
+
+      return (
+        (p.cartella || "") ===
+        cartellaCorrente
+      );
+
+    }
+  );
+}
+
+
+function cartelleNellaCartella(){
+
+  if(!indiceProgetti){
+    return [];
+  }
+
+  return indiceProgetti.cartelle.filter(
+    function(c){
+
+      return (
+        (c.parent || "") ===
+        cartellaCorrente
+      );
+
+    }
+  );
+}
+
+
+/* =========================================================
+   RENDER LISTA PROGETTI
+   ========================================================= */
+
+function renderListaProgetti(){
+
+  const select =
+    $("listaProgetti");
+
+  select.innerHTML =
+    "";
+
+  if(!indiceProgetti){
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+    option.textContent =
+      "Elenco non caricato";
+
+    option.value =
+      "";
+
+    select.appendChild(
+      option
+    );
+
+    aggiornaPercorso();
+
+    return;
+  }
+
+  const cartelle =
+    cartelleNellaCartella();
+
+  const progetti =
+    progettiNellaCartella();
+
+  if(
+    cartellaCorrente
+  ){
+
+    const optionSu =
+      document.createElement(
+        "option"
+      );
+
+    optionSu.value =
+      "__PARENT__";
+
+    optionSu.textContent =
+      "📁 ..";
+
+    optionSu.dataset.tipo =
+      "parent";
+
+    select.appendChild(
+      optionSu
+    );
+  }
+
+  cartelle.forEach(
+    function(cartella){
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        "folder:" +
+        cartella.id;
+
+      option.textContent =
+        "📁 " +
+        cartella.nome;
+
+      option.dataset.tipo =
+        "cartella";
+
+      option.dataset.id =
+        cartella.id;
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+  progetti.forEach(
+    function(progetto){
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        "project:" +
+        progetto.file;
+
+      option.textContent =
+        "📄 " +
+        (
+          progetto.nome ||
+          progetto.file
+        );
+
+      option.dataset.tipo =
+        "progetto";
+
+      option.dataset.file =
+        progetto.file;
+
+      select.appendChild(
+        option
+      );
+
+    }
+  );
+
+  if(
+    !cartelle.length &&
+    !progetti.length
+  ){
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+    option.value =
+      "";
+
+    option.textContent =
+      "Cartella vuota";
+
+    select.appendChild(
+      option
+    );
+  }
+
+  aggiornaPercorso();
+}
+
+
+/* =========================================================
+   CARICAMENTO INDEX GITHUB
+   ========================================================= */
+
+async function caricaIndiceGitHub(
+  token
+){
+
+  const index =
+    await ghGet(
+      "progetti/index.json",
+      token
+    );
+
+  if(!index){
+
+    return indiceVuoto();
+  }
+
+  let data;
+
+  try{
+
+    data =
+      JSON.parse(
+        fromB64(
+          index.content
+        )
+      );
+
+  }catch(e){
+
+    throw Error(
+      "Il file progetti/index.json non contiene un indice valido."
+    );
+  }
+
+  return normalizzaIndice(
+    data
+  );
+}
+
+
+async function salvaIndiceGitHub(
+  token,
+  messaggio
+){
+
+  const index =
+    await ghGet(
+      "progetti/index.json",
+      token
+    );
+
+  await ghPut(
+    "progetti/index.json",
+
+    JSON.stringify(
+      indiceProgetti,
+      null,
+      2
+    ),
+
+    token,
+
+    index
+      ? index.sha
+      : null,
+
+    messaggio ||
+    "Aggiorna indice progetti"
+  );
+}
+
+
+/* =========================================================
+   LISTA GIT
    ========================================================= */
 
 async function listaGit(){
@@ -2743,10 +5776,11 @@ async function listaGit(){
   const select =
     $("listaProgetti");
 
-
   select.innerHTML =
     "";
 
+  $("gitMsg").textContent =
+    "Aggiornamento elenco da Git...";
 
   try{
 
@@ -2760,140 +5794,109 @@ async function listaGit(){
         }
       );
 
-
     if(!response.ok){
 
       throw Error(
         "Elenco non disponibile."
       );
-
     }
 
-
-    const elenco =
+    const data =
       await response.json();
 
-
-    if(!Array.isArray(elenco)){
-
-      throw Error(
-        "Elenco progetti non valido."
+    indiceProgetti =
+      normalizzaIndice(
+        data
       );
 
-    }
-
+    salvaIndiceLocale();
 
     if(
-      elenco.length ===
-      0
+      cartellaCorrente &&
+      !trovaCartella(
+        cartellaCorrente
+      )
     ){
+
+      cartellaCorrente =
+        "";
+    }
+
+    renderListaProgetti();
+
+    $("gitMsg").textContent =
+      "Elenco aggiornato da Git.";
+
+  }catch(e){
+
+    const locale =
+      caricaIndiceLocale();
+
+    if(locale){
+
+      indiceProgetti =
+        locale;
+
+      if(
+        cartellaCorrente &&
+        !trovaCartella(
+          cartellaCorrente
+        )
+      ){
+
+        cartellaCorrente =
+          "";
+      }
+
+      renderListaProgetti();
+
+      $("gitMsg").textContent =
+        "Git non raggiungibile: mostrato l'ultimo elenco disponibile.";
+
+    }else{
 
       const option =
         document.createElement(
           "option"
         );
 
-
       option.value =
         "";
 
-
       option.textContent =
-        "Nessun progetto";
-
+        "Git non raggiungibile";
 
       select.appendChild(
         option
       );
 
-    }else{
-
-      elenco.forEach(
-        nome => {
-
-          const option =
-            document.createElement(
-              "option"
-            );
-
-
-          option.value =
-            nome;
-
-
-          option.textContent =
-            String(nome)
-              .replace(
-                /\.json$/i,
-                ""
-              );
-
-
-          select.appendChild(
-            option
-          );
-
-        }
-      );
-
+      $("gitMsg").textContent =
+        "Git non raggiungibile.";
     }
-
-
-    $("gitMsg").textContent =
-      "Elenco aggiornato.";
-
-  }catch(e){
-
-    const option =
-      document.createElement(
-        "option"
-      );
-
-
-    option.value =
-      "";
-
-
-    option.textContent =
-      "Git non raggiungibile";
-
-
-    select.appendChild(
-      option
-    );
-
-
-    $("gitMsg").textContent =
-      "Git non raggiungibile.";
-
   }
-
 }
 
 
 /* =========================================================
-   CARICA PROGETTO DA GITHUB
+   CARICA PROGETTO DA GIT
    ========================================================= */
 
-async function caricaGit(){
+async function caricaProgettoGit(
+  file
+){
 
-  const nome =
-    $("listaProgetti").value;
-
-
-  if(!nome){
-
+  if(!file){
     return;
-
   }
-
 
   try{
 
     const response =
       await fetch(
         "progetti/" +
-        encodeURIComponent(nome) +
+        encodeURIComponent(
+          file
+        ) +
         "?" +
         Date.now(),
         {
@@ -2902,32 +5905,25 @@ async function caricaGit(){
         }
       );
 
-
     if(!response.ok){
 
       throw Error(
         "Impossibile caricare il progetto."
       );
-
     }
-
 
     const progetto =
       await response.json();
-
 
     applicaConfigurazione(
       progetto
     );
 
-
     $("gitMsg").textContent =
-      "Progetto caricato.";
-
+      "Progetto caricato da Git.";
 
     $("msg").textContent =
       "Progetto caricato da Git.";
-
 
     chiudiProgetti();
 
@@ -2936,20 +5932,676 @@ async function caricaGit(){
     $("gitMsg").textContent =
       "Impossibile caricare il progetto.";
 
-
     alert(
       e.message ||
-      "Errore durante il caricamento."
+      "Errore durante il caricamento da Git."
     );
+  }
+}
 
+
+async function caricaGitSelezionato(){
+
+  const value =
+    $("listaProgetti").value;
+
+  if(!value){
+    return;
   }
 
+  if(
+    value ===
+    "__PARENT__"
+  ){
+
+    entraCartella(
+      cartellaCorrente
+        ? (
+            trovaCartella(
+              cartellaCorrente
+            )?.parent || ""
+          )
+        : ""
+    );
+
+    return;
+  }
+
+  if(
+    value.startsWith(
+      "folder:"
+    )
+  ){
+
+    const id =
+      value.slice(
+        "folder:".length
+      );
+
+    entraCartella(
+      id
+    );
+
+    return;
+  }
+
+  if(
+    value.startsWith(
+      "project:"
+    )
+  ){
+
+    const file =
+      value.slice(
+        "project:".length
+      );
+
+    await caricaProgettoGit(
+      file
+    );
+  }
 }
 
 
 /* =========================================================
-   SALVA SU GITHUB
+   CARTELLE
    ========================================================= */
+
+function entraCartella(id){
+
+  if(
+    id ===
+    "__PARENT__"
+  ){
+
+    const corrente =
+      trovaCartella(
+        cartellaCorrente
+      );
+
+    cartellaCorrente =
+      corrente
+        ? (
+            corrente.parent ||
+            ""
+          )
+        : "";
+
+  }else{
+
+    if(
+      id &&
+      !trovaCartella(id)
+    ){
+
+      return;
+    }
+
+    cartellaCorrente =
+      id || "";
+  }
+
+  renderListaProgetti();
+}
+
+
+function creaCartella(){
+
+  if(!tokenSalvato()){
+
+    alert(
+      "Per creare cartelle devi avere un token GitHub salvato nel browser."
+    );
+
+    return;
+  }
+
+  if(!indiceProgetti){
+
+    alert(
+      "Prima aggiorna l'elenco da Git."
+    );
+
+    return;
+  }
+
+  const nome =
+    prompt(
+      "Nome della nuova cartella:"
+    );
+
+  if(nome === null){
+    return;
+  }
+
+  const pulito =
+    nome.trim();
+
+  if(!pulito){
+    return;
+  }
+
+  const esistente =
+    indiceProgetti.cartelle.some(
+      function(c){
+
+        return (
+          c.parent ===
+          cartellaCorrente &&
+          c.nome.toLowerCase() ===
+          pulito.toLowerCase()
+        );
+
+      }
+    );
+
+  if(esistente){
+
+    alert(
+      "Esiste già una cartella con questo nome qui."
+    );
+
+    return;
+  }
+
+  indiceProgetti.cartelle.push({
+
+    id:
+      generaIdCartella(),
+
+    nome:
+      pulito,
+
+    parent:
+      cartellaCorrente
+
+  });
+
+  salvaIndiceConControllo(
+    "Crea cartella " +
+    pulito
+  );
+}
+
+
+async function salvaIndiceConControllo(
+  messaggio
+){
+
+  const token =
+    localStorage.getItem(
+      TOKEN_KEY
+    );
+
+  if(
+    !token ||
+    !token.trim()
+  ){
+
+    alert(
+      "Per modificare le cartelle devi avere un token GitHub salvato nel browser."
+    );
+
+    return false;
+  }
+
+  try{
+
+    $("gitMsg").textContent =
+      "Salvataggio modifica cartelle...";
+
+    await salvaIndiceGitHub(
+      token.trim(),
+      messaggio
+    );
+
+    salvaIndiceLocale();
+
+    renderListaProgetti();
+
+    $("gitMsg").textContent =
+      "Modifica cartelle salvata su Git.";
+
+    return true;
+
+  }catch(e){
+
+    console.error(e);
+
+    $("gitMsg").textContent =
+      "Modifica cartelle non riuscita.";
+
+    alert(
+      "Non è stato possibile modificare le cartelle.\n\n" +
+      (
+        e.message ||
+        String(e)
+      )
+    );
+
+    return false;
+  }
+}
+
+
+async function eliminaCartella(){
+
+  if(!tokenSalvato()){
+
+    alert(
+      "Per eliminare cartelle devi avere un token GitHub salvato nel browser."
+    );
+
+    return;
+  }
+
+  if(!cartellaCorrente){
+
+    alert(
+      "Non puoi eliminare la cartella principale."
+    );
+
+    return;
+  }
+
+  const cartella =
+    trovaCartella(
+      cartellaCorrente
+    );
+
+  if(!cartella){
+    return;
+  }
+
+  const figli =
+    cartelleNellaCartella();
+
+  const progetti =
+    progettiNellaCartella();
+
+  let messaggio =
+    'Vuoi eliminare la cartella "' +
+    cartella.nome +
+    '"?';
+
+  if(
+    figli.length ||
+    progetti.length
+  ){
+
+    messaggio +=
+      "\n\nLa cartella contiene ";
+
+    if(
+      figli.length
+    ){
+
+      messaggio +=
+        figli.length +
+        " sottocartella/e";
+
+    }
+
+    if(
+      figli.length &&
+      progetti.length
+    ){
+
+      messaggio +=
+        " e ";
+
+    }
+
+    if(
+      progetti.length
+    ){
+
+      messaggio +=
+        progetti.length +
+        " progetto/i";
+
+    }
+
+    messaggio +=
+      ".\n\nI progetti non verranno cancellati da Git: " +
+      "verranno spostati nella cartella superiore.";
+  }
+
+  if(
+    !confirm(
+      messaggio
+    )
+  ){
+
+    return;
+  }
+
+  const parent =
+    cartella.parent ||
+    "";
+
+  indiceProgetti.progetti
+    .forEach(
+      function(progetto){
+
+        if(
+          progetto.cartella ===
+          cartellaCorrente
+        ){
+
+          progetto.cartella =
+            parent;
+        }
+
+      }
+    );
+
+  indiceProgetti.cartelle
+    .forEach(
+      function(c){
+
+        if(
+          c.parent ===
+          cartellaCorrente
+        ){
+
+          c.parent =
+            parent;
+        }
+
+      }
+    );
+
+  indiceProgetti.cartelle =
+    indiceProgetti.cartelle.filter(
+      function(c){
+
+        return (
+          c.id !==
+          cartellaCorrente
+        );
+
+      }
+    );
+
+  cartellaCorrente =
+    parent;
+
+  await salvaIndiceConControllo(
+    "Elimina cartella " +
+    cartella.nome
+  );
+}
+
+
+async function spostaCartella(){
+
+  if(!tokenSalvato()){
+
+    alert(
+      "Per spostare cartelle devi avere un token GitHub salvato nel browser."
+    );
+
+    return;
+  }
+
+  if(!cartellaCorrente){
+
+    alert(
+      "Sei nella cartella principale."
+    );
+
+    return;
+  }
+
+  const cartella =
+    trovaCartella(
+      cartellaCorrente
+    );
+
+  if(!cartella){
+    return;
+  }
+
+  const possibili =
+    indiceProgetti.cartelle.filter(
+      function(c){
+
+        return (
+          c.id !==
+          cartellaCorrente
+        );
+
+      }
+    );
+
+  const righe = [
+    'Cartella da spostare: "' +
+    cartella.nome +
+    '"',
+    "",
+    "Cartelle disponibili:",
+    '0 = Principale'
+  ];
+
+  possibili.forEach(
+    function(c,i){
+
+      righe.push(
+        (
+          i + 1
+        ) +
+        " = " +
+        nomePercorsoCartellaPerId(
+          c.id
+        )
+      );
+
+    }
+  );
+
+  const risposta =
+    prompt(
+      righe.join("\n") +
+      "\n\nInserisci il numero della cartella di destinazione:"
+    );
+
+  if(risposta === null){
+    return;
+  }
+
+  const numero =
+    Number(
+      risposta
+    );
+
+  if(
+    !Number.isInteger(numero) ||
+    numero < 0 ||
+    numero > possibili.length
+  ){
+
+    alert(
+      "Destinazione non valida."
+    );
+
+    return;
+  }
+
+  let destinazione =
+    "";
+
+  if(numero > 0){
+
+    destinazione =
+      possibili[
+        numero - 1
+      ].id;
+  }
+
+  if(
+    destinazione ===
+    cartellaCorrente
+  ){
+
+    alert(
+      "Una cartella non può essere spostata dentro se stessa."
+    );
+
+    return;
+  }
+
+  if(
+    destinazione &&
+    cartellaDiscendente(
+      destinazione,
+      cartellaCorrente
+    )
+  ){
+
+    alert(
+      "Non puoi spostare una cartella dentro una sua sottocartella."
+    );
+
+    return;
+  }
+
+  cartella.parent =
+    destinazione;
+
+  cartellaCorrente =
+    destinazione;
+
+  await salvaIndiceConControllo(
+    "Sposta cartella " +
+    cartella.nome
+  );
+}
+
+
+function cartellaDiscendente(
+  possibileDiscendente,
+  antenato
+){
+
+  let id =
+    possibileDiscendente;
+
+  let sicurezza =
+    0;
+
+  while(
+    id &&
+    sicurezza < 100
+  ){
+
+    if(
+      id ===
+      antenato
+    ){
+
+      return true;
+    }
+
+    const c =
+      trovaCartella(
+        id
+      );
+
+    if(!c){
+      return false;
+    }
+
+    id =
+      c.parent;
+
+    sicurezza++;
+  }
+
+  return false;
+}
+
+
+function nomePercorsoCartellaPerId(
+  id
+){
+
+  if(!id){
+    return "Principale";
+  }
+
+  const parti = [];
+
+  let corrente =
+    id;
+
+  let sicurezza =
+    0;
+
+  while(
+    corrente &&
+    sicurezza < 100
+  ){
+
+    const c =
+      trovaCartella(
+        corrente
+      );
+
+    if(!c){
+      break;
+    }
+
+    parti.unshift(
+      c.nome
+    );
+
+    corrente =
+      c.parent;
+
+    sicurezza++;
+  }
+
+  return parti.join(
+    " / "
+  );
+}
+
+
+/* =========================================================
+   SALVATAGGIO PROGETTO SU GIT
+   ========================================================= */
+
+function nomeFileSicuro(
+  nome
+){
+
+  let file =
+    nome
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      )
+      .replace(
+        /[^a-z0-9]+/g,
+        "-"
+      )
+      .replace(
+        /^-+|-+$/g,
+        ""
+      );
+
+  if(!file){
+    file =
+      "progetto";
+  }
+
+  return file +
+    ".json";
+}
+
 
 async function salvaGit(){
 
@@ -2961,42 +6613,26 @@ async function salvaGit(){
         "progetto"
       );
 
-
     if(nome === null){
-
       return;
-
     }
-
 
     nome =
       nome.trim();
 
-
     if(!nome){
-
       nome =
         "progetto";
-
     }
-
-
-    /*
-     * Password del sito.
-     */
 
     const password =
       prompt(
         "Password:"
       );
 
-
     if(password === null){
-
       return;
-
     }
-
 
     const passwordResponse =
       await fetch(
@@ -3008,21 +6644,17 @@ async function salvaGit(){
         }
       );
 
-
     if(!passwordResponse.ok){
 
       throw Error(
         "Password non raggiungibile."
       );
-
     }
-
 
     const passwordCorretta =
       (
         await passwordResponse.text()
       ).trim();
-
 
     if(
       password.trim() !==
@@ -3033,83 +6665,38 @@ async function salvaGit(){
         "Password errata."
       );
 
-
       return;
-
     }
-
-
-    /*
-     * Token GitHub.
-     */
 
     const token =
       tokenGit();
-
 
     if(!token){
 
       $("gitMsg").textContent =
         "Salvataggio annullato.";
 
+      aggiornaPermessiCartelle();
+
       return;
-
     }
-
-
-    /*
-     * Progetto corrente.
-     */
 
     const progetto =
       creaProgetto();
 
-
     progetto.nome =
       nome;
 
+    progetto.cartella =
+      cartellaCorrente;
 
-    /*
-     * Nome file sicuro.
-     */
-
-    let file =
-      nome
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(
-          /[\u0300-\u036f]/g,
-          ""
-        )
-        .replace(
-          /[^a-z0-9]+/g,
-          "-"
-        )
-        .replace(
-          /^-+|-+$/g,
-          ""
-        );
-
-
-    if(!file){
-
-      file =
-        "progetto";
-
-    }
-
-
-    file +=
-      ".json";
-
+    const file =
+      nomeFileSicuro(
+        nome
+      );
 
     $("gitMsg").textContent =
       "Salvataggio...";
-
-
-    /*
-     * Controlliamo se esiste già.
-     */
 
     const vecchio =
       await ghGet(
@@ -3118,12 +6705,8 @@ async function salvaGit(){
         token
       );
 
-
-    /*
-     * Salva il progetto.
-     */
-
     await ghPut(
+
       "progetti/" +
       file,
 
@@ -3143,103 +6726,67 @@ async function salvaGit(){
       nome
     );
 
-
-    /*
-     * Recupera l'indice.
-     */
-
-    const index =
-      await ghGet(
-        "progetti/index.json",
+    indiceProgetti =
+      await caricaIndiceGitHub(
         token
       );
 
+    const esistente =
+      indiceProgetti.progetti.find(
+        function(p){
 
-    let elenco =
-      [];
-
-
-    if(index){
-
-      try{
-
-        elenco =
-          JSON.parse(
-            fromB64(
-              index.content
-            )
+          return (
+            p.file ===
+            file
           );
 
-      }catch(e){
-
-        elenco =
-          [];
-
-      }
-
-    }
-
-
-    if(!Array.isArray(elenco)){
-
-      elenco =
-        [];
-
-    }
-
-
-    if(
-      !elenco.includes(file)
-    ){
-
-      elenco.push(
-        file
+        }
       );
 
+    if(esistente){
+
+      esistente.nome =
+        nome;
+
+      esistente.cartella =
+        cartellaCorrente;
+
+    }else{
+
+      indiceProgetti.progetti.push({
+
+        file:
+          file,
+
+        nome:
+          nome,
+
+        cartella:
+          cartellaCorrente
+
+      });
+
     }
 
-
-    elenco.sort();
-
-
-    /*
-     * Aggiorna l'indice.
-     */
-
-    await ghPut(
-      "progetti/index.json",
-
-      JSON.stringify(
-        elenco,
-        null,
-        2
-      ),
-
+    await salvaIndiceGitHub(
       token,
-
-      index
-        ? index.sha
-        : null,
-
       "Aggiorna elenco progetti"
     );
 
+    salvaIndiceLocale();
 
     $("gitMsg").textContent =
-      "Salvato: " +
+      "Salvato su Git: " +
       nome;
 
-
-    await listaGit();
+    renderListaProgetti();
 
   }catch(e){
 
     console.error(e);
 
-
     $("gitMsg").textContent =
       "Salvataggio Git non riuscito.";
-
 
     const errore =
       String(
@@ -3247,10 +6794,8 @@ async function salvaGit(){
         e
       );
 
-
     const basso =
       errore.toLowerCase();
-
 
     if(
       errore.includes("401") ||
@@ -3266,12 +6811,11 @@ async function salvaGit(){
         TOKEN_KEY
       );
 
+      aggiornaPermessiCartelle();
 
       alert(
-        "Il token GitHub non è valido " +
-        "o è scaduto.\n\n" +
-        "Il token è stato eliminato " +
-        "dal browser."
+        "Il token GitHub non è valido o è scaduto.\n\n" +
+        "Il token è stato eliminato dal browser."
       );
 
     }else{
@@ -3280,80 +6824,378 @@ async function salvaGit(){
         "Non è stato possibile salvare su Git.\n\n" +
         errore
       );
-
     }
-
   }
-
 }
 
 
 /* =========================================================
-   CHIUSURA CONFRONTO CON CLICK FUORI
+   EVENTI INTERFACCIA
    ========================================================= */
 
-$("modal").addEventListener(
-  "click",
-  function(event){
+function collegaEventi(){
 
-    if(
-      event.target ===
-      $("modal")
-    ){
+  $("btnIstruzioni")
+    .addEventListener(
+      "click",
+      apriIstruzioni
+    );
 
-      chiudiIstruzioni();
+  $("btnChiudiIstruzioni")
+    .addEventListener(
+      "click",
+      chiudiIstruzioni
+    );
 
-    }
+  $("btnProgetti")
+    .addEventListener(
+      "click",
+      apriProgetti
+    );
 
-  }
-);
+  $("btnChiudiProgetti")
+    .addEventListener(
+      "click",
+      chiudiProgetti
+    );
 
+  $("btnGenera")
+    .addEventListener(
+      "click",
+      genera
+    );
 
-$("progettiModal").addEventListener(
-  "click",
-  function(event){
+  $("btnPulisci")
+    .addEventListener(
+      "click",
+      pulisciTabella
+    );
 
-    if(
-      event.target ===
-      $("progettiModal")
-    ){
+  $("btnReset")
+    .addEventListener(
+      "click",
+      reset
+    );
 
-      chiudiProgetti();
+  $("btnPasso")
+    .addEventListener(
+      "click",
+      passo
+    );
 
-    }
+  $("btnAvvia")
+    .addEventListener(
+      "click",
+      avvia
+    );
 
-  }
-);
+  $("btnFerma")
+    .addEventListener(
+      "click",
+      ferma
+    );
+
+  $("btnScrollSinistra")
+    .addEventListener(
+      "click",
+      function(){
+
+        scrollTape(-4);
+
+      }
+    );
+
+  $("btnScrollDestra")
+    .addEventListener(
+      "click",
+      function(){
+
+        scrollTape(4);
+
+      }
+    );
+
+  $("btnAggiungiConfronto")
+    .addEventListener(
+      "click",
+      aggiungiConfronto
+    );
+
+  $("btnEseguiConfronto")
+    .addEventListener(
+      "click",
+      eseguiConfronto
+    );
+
+  $("btnSvuotaConfronto")
+    .addEventListener(
+      "click",
+      svuotaConfronto
+    );
+
+  $("btnAggiornaGit")
+    .addEventListener(
+      "click",
+      listaGit
+    );
+
+  $("btnCaricaGit")
+    .addEventListener(
+      "click",
+      caricaGitSelezionato
+    );
+
+  $("btnCaricaComputer")
+    .addEventListener(
+      "click",
+      caricaComputer
+    );
+
+  $("fileInput")
+    .addEventListener(
+      "change",
+      leggiFile
+    );
+
+  $("btnScarica")
+    .addEventListener(
+      "click",
+      scaricaProgetto
+    );
+
+  $("btnSalvaGit")
+    .addEventListener(
+      "click",
+      salvaGit
+    );
+
+  $("btnDimenticaToken")
+    .addEventListener(
+      "click",
+      dimenticaToken
+    );
+
+  $("btnCreaCartella")
+    .addEventListener(
+      "click",
+      creaCartella
+    );
+
+  $("btnEliminaCartella")
+    .addEventListener(
+      "click",
+      eliminaCartella
+    );
+
+  $("btnSpostaCartella")
+    .addEventListener(
+      "click",
+      spostaCartella
+    );
+
+  $("listaProgetti")
+    .addEventListener(
+      "dblclick",
+      function(){
+
+        const value =
+          $("listaProgetti").value;
+
+        if(!value){
+          return;
+        }
+
+        if(
+          value ===
+          "__PARENT__"
+        ){
+
+          entraCartella(
+            cartellaCorrente
+              ? (
+                  trovaCartella(
+                    cartellaCorrente
+                  )?.parent || ""
+                )
+              : ""
+          );
+
+          return;
+        }
+
+        if(
+          value.startsWith(
+            "folder:"
+          )
+        ){
+
+          entraCartella(
+            value.slice(
+              "folder:".length
+            )
+          );
+
+          return;
+        }
+
+        if(
+          value.startsWith(
+            "project:"
+          )
+        ){
+
+          caricaProgettoGit(
+            value.slice(
+              "project:".length
+            )
+          );
+
+        }
+
+      }
+    );
+
+  $("nastro")
+    .addEventListener(
+      "input",
+      function(){
+
+        const lunghezza =
+          [...String(
+            $("nastro").value
+          )].length;
+
+        if(
+          lunghezza === 0
+        ){
+
+          macchina.posizioneIniziale =
+            0;
+
+        }else{
+
+          macchina.posizioneIniziale =
+            Math.min(
+              macchina.posizioneIniziale,
+              lunghezza - 1
+            );
+
+        }
+
+        reset();
+
+      }
+    );
+
+  $("modal")
+    .addEventListener(
+      "click",
+      function(event){
+
+        if(
+          event.target ===
+          $("modal")
+        ){
+
+          chiudiIstruzioni();
+
+        }
+
+      }
+    );
+
+  $("progettiModal")
+    .addEventListener(
+      "click",
+      function(event){
+
+        if(
+          event.target ===
+          $("progettiModal")
+        ){
+
+          chiudiProgetti();
+
+        }
+
+      }
+    );
+
+}
 
 
 /* =========================================================
    INIZIALIZZAZIONE
    ========================================================= */
 
-try{
+function inizializza(){
 
-  genera();
+  try{
 
-  reset();
+    collegaEventi();
 
-  renderConfronto();
+    indiceProgetti =
+      caricaIndiceLocale();
 
-}catch(e){
+    aggiornaPermessiCartelle();
 
-  console.error(
-    "Errore inizializzazione:",
-    e
-  );
+    genera();
 
+    macchina.posizioneIniziale =
+      0;
 
-  $("err").textContent =
-    "Errore durante l'avvio: " +
-    (
-      e.message ||
-      String(e)
+    reset();
+
+    renderConfronto();
+
+  }catch(e){
+
+    console.error(
+      "Errore inizializzazione:",
+      e
     );
 
+    const err =
+      $("err");
+
+    if(err){
+
+      err.textContent =
+        "Errore durante l'avvio: " +
+        (
+          e.message ||
+          String(e)
+        );
+    }
+
+    alert(
+      "Errore durante l'avvio del programma.\n\n" +
+      (
+        e.message ||
+        String(e)
+      )
+    );
+  }
+
 }
+
+
+if(
+  document.readyState ===
+  "loading"
+){
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    inizializza
+  );
+
+}else{
+
+  inizializza();
+
+}
+
 </script>
 
 </body>
