@@ -6189,83 +6189,448 @@ async function eliminaCartella(){
   if(!tokenSalvato()){
 
     alert(
-      "Per eliminare cartelle devi avere un token GitHub salvato nel browser."
+      "Per eliminare elementi devi avere un token GitHub salvato nel browser."
     );
 
     return;
   }
 
-  if(!cartellaCorrente){
+  if(!indiceProgetti){
 
     alert(
-      "Non puoi eliminare la cartella principale."
+      "Prima aggiorna l'elenco da Git."
     );
 
     return;
   }
+
+
+  /* =====================================================
+     ELEMENTO SELEZIONATO
+     ===================================================== */
+
+  const value =
+    $("listaProgetti").value;
+
+  if(!value){
+
+    alert(
+      "Seleziona prima un file o una cartella da eliminare."
+    );
+
+    return;
+  }
+
+  if(
+    value ===
+    "__PARENT__"
+  ){
+
+    alert(
+      "La voce '..' non può essere eliminata."
+    );
+
+    return;
+  }
+
+
+  let tipo =
+    "";
+
+  let elemento =
+    null;
+
+
+  /* =====================================================
+     FILE / PROGETTO
+     ===================================================== */
+
+  if(
+    value.startsWith(
+      "project:"
+    )
+  ){
+
+    tipo =
+      "progetto";
+
+    const file =
+      value.slice(
+        "project:".length
+      );
+
+    elemento =
+      indiceProgetti.progetti.find(
+        function(p){
+
+          return p.file === file;
+
+        }
+      );
+
+  }
+
+
+  /* =====================================================
+     CARTELLA
+     ===================================================== */
+
+  else if(
+    value.startsWith(
+      "folder:"
+    )
+  ){
+
+    tipo =
+      "cartella";
+
+    const id =
+      value.slice(
+        "folder:".length
+      );
+
+    elemento =
+      trovaCartella(
+        id
+      );
+
+  }
+
+
+  if(!elemento){
+
+    alert(
+      "L'elemento selezionato non è più disponibile."
+    );
+
+    return;
+  }
+
+
+  /* =====================================================
+     ELIMINAZIONE SINGOLO FILE
+     ===================================================== */
+
+  if(
+    tipo ===
+    "progetto"
+  ){
+
+    const nome =
+      elemento.nome ||
+      elemento.file;
+
+
+    if(
+      !confirm(
+        'Vuoi eliminare "' +
+        nome +
+        '"?\n\n' +
+        "Il file verrà eliminato definitivamente da GitHub."
+      )
+    ){
+
+      return;
+    }
+
+
+    try{
+
+      const token =
+        localStorage.getItem(
+          TOKEN_KEY
+        ).trim();
+
+
+      $("gitMsg").textContent =
+        "Eliminazione del progetto...";
+
+
+      /*
+       * Recupera lo SHA del file necessario
+       * per poterlo eliminare da GitHub.
+       */
+
+      const remoto =
+        await ghGet(
+          "progetti/" +
+          elemento.file,
+          token
+        );
+
+
+      if(!remoto){
+
+        throw Error(
+          "Il file non è stato trovato su GitHub."
+        );
+
+      }
+
+
+      /*
+       * Elimina il file utilizzando ghPut
+       * con contenuto vuoto? No:
+       *
+       * GitHub richiede DELETE per eliminare un file.
+       *
+       * Usiamo direttamente fetch qui.
+       */
+
+      const g =
+        ghInfo();
+
+      const url =
+        "https://api.github.com/repos/" +
+        encodeURIComponent(g.owner) +
+        "/" +
+        encodeURIComponent(g.repo) +
+        "/contents/progetti/" +
+        encodeURIComponent(elemento.file);
+
+
+      const response =
+        await fetch(
+          url,
+          {
+
+            method:
+              "DELETE",
+
+            headers:{
+
+              Accept:
+                "application/vnd.github+json",
+
+              "Content-Type":
+                "application/json",
+
+              Authorization:
+                "Bearer " +
+                token,
+
+              "X-GitHub-Api-Version":
+                "2022-11-28"
+
+            },
+
+            body:
+              JSON.stringify({
+
+                message:
+                  "Elimina progetto " +
+                  nome,
+
+                sha:
+                  remoto.sha
+
+              })
+
+          }
+        );
+
+
+      if(!response.ok){
+
+        let messaggio =
+          "";
+
+        try{
+
+          const data =
+            await response.json();
+
+          messaggio =
+            data.message ||
+            "";
+
+        }catch(e){}
+
+        throw Error(
+          "GitHub: " +
+          (
+            messaggio ||
+            response.status
+          )
+        );
+
+      }
+
+
+      /*
+       * Rimuove il progetto dall'indice.
+       */
+
+      indiceProgetti.progetti =
+        indiceProgetti.progetti.filter(
+          function(p){
+
+            return (
+              p.file !==
+              elemento.file
+            );
+
+          }
+        );
+
+
+      await salvaIndiceGitHub(
+        token,
+        "Aggiorna elenco dopo eliminazione progetto"
+      );
+
+
+      salvaIndiceLocale();
+
+      renderListaProgetti();
+
+
+      $("gitMsg").textContent =
+        'Progetto "' +
+        nome +
+        '" eliminato.';
+
+
+    }catch(e){
+
+      console.error(e);
+
+      $("gitMsg").textContent =
+        "Eliminazione non riuscita.";
+
+      alert(
+        "Non è stato possibile eliminare il progetto.\n\n" +
+        (
+          e.message ||
+          String(e)
+        )
+      );
+
+    }
+
+    return;
+  }
+
+
+  /* =====================================================
+     ELIMINAZIONE CARTELLA
+     ===================================================== */
 
   const cartella =
-    trovaCartella(
-      cartellaCorrente
+    elemento;
+
+
+  /*
+   * Trova tutte le sottocartelle della cartella.
+   */
+
+  const cartelleDaEliminare = [
+    cartella.id
+  ];
+
+  let indice =
+    0;
+
+
+  while(
+    indice <
+    cartelleDaEliminare.length
+  ){
+
+    const id =
+      cartelleDaEliminare[indice];
+
+
+    indiceProgetti.cartelle.forEach(
+      function(c){
+
+        if(
+          c.parent ===
+          id &&
+          !cartelleDaEliminare.includes(
+            c.id
+          )
+        ){
+
+          cartelleDaEliminare.push(
+            c.id
+          );
+
+        }
+
+      }
     );
 
-  if(!cartella){
-    return;
+
+    indice++;
+
   }
 
-  const figli =
-    cartelleNellaCartella();
 
-  const progetti =
-    progettiNellaCartella();
+  /*
+   * Trova tutti i file contenuti nella cartella
+   * e nelle eventuali sottocartelle.
+   */
+
+  const progettiDaEliminare =
+    indiceProgetti.progetti.filter(
+      function(progetto){
+
+        return cartelleDaEliminare.includes(
+          progetto.cartella || ""
+        );
+
+      }
+    );
+
+
+  /* =====================================================
+     CONFERMA
+     ===================================================== */
 
   let messaggio =
     'Vuoi eliminare la cartella "' +
     cartella.nome +
     '"?';
 
+
   if(
-    figli.length ||
-    progetti.length
+    progettiDaEliminare.length > 0
   ){
 
     messaggio +=
-      "\n\nLa cartella contiene ";
+      "\n\nATTENZIONE: nella cartella sono presenti " +
+      progettiDaEliminare.length +
+      " file/progetto";
 
     if(
-      figli.length
+      progettiDaEliminare.length !== 1
     ){
 
       messaggio +=
-        figli.length +
-        " sottocartella/e";
-
-    }
-
-    if(
-      figli.length &&
-      progetti.length
-    ){
-
-      messaggio +=
-        " e ";
-
-    }
-
-    if(
-      progetti.length
-    ){
-
-      messaggio +=
-        progetti.length +
-        " progetto/i";
+        "i";
 
     }
 
     messaggio +=
-      ".\n\nI progetti non verranno cancellati da Git: " +
-      "verranno spostati nella cartella superiore.";
+      ".\n\nTutti i file verranno eliminati definitivamente da GitHub.";
+
   }
+
+
+  if(
+    cartelleDaEliminare.length > 1
+  ){
+
+    messaggio +=
+      "\n\nVerranno eliminate anche " +
+      (
+        cartelleDaEliminare.length - 1
+      ) +
+      " sottocartella/e.";
+
+  }
+
 
   if(
     !confirm(
@@ -6276,63 +6641,216 @@ async function eliminaCartella(){
     return;
   }
 
-  const parent =
-    cartella.parent ||
-    "";
 
-  indiceProgetti.progetti
-    .forEach(
-      function(progetto){
+  /* =====================================================
+     ELIMINAZIONE DA GITHUB
+     ===================================================== */
 
-        if(
-          progetto.cartella ===
-          cartellaCorrente
-        ){
+  try{
 
-          progetto.cartella =
-            parent;
-        }
+    const token =
+      localStorage.getItem(
+        TOKEN_KEY
+      ).trim();
 
-      }
-    );
 
-  indiceProgetti.cartelle
-    .forEach(
-      function(c){
+    $("gitMsg").textContent =
+      "Eliminazione della cartella...";
 
-        if(
-          c.parent ===
-          cartellaCorrente
-        ){
 
-          c.parent =
-            parent;
-        }
+    /*
+     * Elimina prima tutti i file presenti
+     * nella cartella e nelle sottocartelle.
+     */
 
-      }
-    );
+    for(
+      const progetto of
+      progettiDaEliminare
+    ){
 
-  indiceProgetti.cartelle =
-    indiceProgetti.cartelle.filter(
-      function(c){
-
-        return (
-          c.id !==
-          cartellaCorrente
+      const remoto =
+        await ghGet(
+          "progetti/" +
+          progetto.file,
+          token
         );
 
+
+      /*
+       * Se il file esiste ancora su GitHub,
+       * lo eliminiamo.
+       */
+
+      if(remoto){
+
+        const g =
+          ghInfo();
+
+        const url =
+          "https://api.github.com/repos/" +
+          encodeURIComponent(g.owner) +
+          "/" +
+          encodeURIComponent(g.repo) +
+          "/contents/progetti/" +
+          encodeURIComponent(progetto.file);
+
+
+        const response =
+          await fetch(
+            url,
+            {
+
+              method:
+                "DELETE",
+
+              headers:{
+
+                Accept:
+                  "application/vnd.github+json",
+
+                "Content-Type":
+                  "application/json",
+
+                Authorization:
+                  "Bearer " +
+                  token,
+
+                "X-GitHub-Api-Version":
+                  "2022-11-28"
+
+              },
+
+              body:
+                JSON.stringify({
+
+                  message:
+                    "Elimina progetto " +
+                    (
+                      progetto.nome ||
+                      progetto.file
+                    ),
+
+                  sha:
+                    remoto.sha
+
+                })
+
+            }
+          );
+
+
+        if(!response.ok){
+
+          let errore =
+            "";
+
+          try{
+
+            const data =
+              await response.json();
+
+            errore =
+              data.message ||
+              "";
+
+          }catch(e){}
+
+          throw Error(
+            "GitHub: " +
+            (
+              errore ||
+              response.status
+            )
+          );
+
+        }
+
       }
+
+    }
+
+
+    /* =================================================
+       RIMUOVE I PROGETTI DALL'INDICE
+       ================================================= */
+
+    indiceProgetti.progetti =
+      indiceProgetti.progetti.filter(
+        function(progetto){
+
+          return !progettiDaEliminare.includes(
+            progetto
+          );
+
+        }
+      );
+
+
+    /* =================================================
+       RIMUOVE LE CARTELLE DALL'INDICE
+       ================================================= */
+
+    indiceProgetti.cartelle =
+      indiceProgetti.cartelle.filter(
+        function(c){
+
+          return !cartelleDaEliminare.includes(
+            c.id
+          );
+
+        }
+      );
+
+
+    /*
+     * Torna nella cartella madre.
+     */
+
+    cartellaCorrente =
+      cartella.parent ||
+      "";
+
+
+    /*
+     * Salva il nuovo indice su GitHub.
+     */
+
+    await salvaIndiceGitHub(
+      token,
+      "Elimina cartella " +
+      cartella.nome
     );
 
-  cartellaCorrente =
-    parent;
 
-  await salvaIndiceConControllo(
-    "Elimina cartella " +
-    cartella.nome
-  );
+    salvaIndiceLocale();
+
+    renderListaProgetti();
+
+
+    $("gitMsg").textContent =
+      'Cartella "' +
+      cartella.nome +
+      '" eliminata.';
+
+
+  }catch(e){
+
+    console.error(e);
+
+    $("gitMsg").textContent =
+      "Eliminazione non riuscita.";
+
+    alert(
+      "Non è stato possibile completare l'eliminazione.\n\n" +
+      (
+        e.message ||
+        String(e)
+      )
+    );
+
+  }
+
 }
-
 
 async function spostaCartella(){
 
