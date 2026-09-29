@@ -31,87 +31,104 @@
     {
       "file": "addizione-base-1-mantenimento.json",
       "nome": "addizione-base-1-mantenimento",
-      "cartella": "cartella-muld41r4-kwunfa"
+      "cartella": "cartella-muld41r4-kwunfa",
+      "descrizione": ""
     },
     {
       "file": "ciao.json",
       "nome": "ciao",
-      "cartella": ""
+      "cartella": "",
+      "descrizione": ""
     },
     {
       "file": "differenza-in-base-1-avanzata.json",
       "nome": "differenza-in-base-1-avanzata",
-      "cartella": "cartella-muld41r4-kwunfa"
+      "cartella": "cartella-muld41r4-kwunfa",
+      "descrizione": ""
     },
     {
       "file": "differenza-in-base-1-base.json",
       "nome": "differenza-in-base-1-base",
-      "cartella": "cartella-muld41r4-kwunfa"
+      "cartella": "cartella-muld41r4-kwunfa",
+      "descrizione": ""
     },
     {
       "file": "inverti-0-e-1.json",
       "nome": "inverti-0-e-1",
-      "cartella": "cartella-muld41r4-kwunfa"
+      "cartella": "cartella-muld41r4-kwunfa",
+      "descrizione": ""
     },
     {
       "file": "moltiplica-x8-binario.json",
       "nome": "moltiplica-x8-binario",
-      "cartella": "cartella-muldtk0m-qwgpbl"
+      "cartella": "cartella-muldtk0m-qwgpbl",
+      "descrizione": ""
     },
     {
       "file": "n-di-a-pari-0-dispari-1.json",
       "nome": "n-di-a-pari-0-dispari-1",
-      "cartella": "cartella-mulccgaq-rftnl8"
+      "cartella": "cartella-mulccgaq-rftnl8",
+      "descrizione": ""
     },
     {
       "file": "somma-base-1.json",
       "nome": "somma-base-1",
-      "cartella": "cartella-muld41r4-kwunfa"
+      "cartella": "cartella-muld41r4-kwunfa",
+      "descrizione": ""
     },
     {
       "file": "stringa-a-b-c-ogni-3.json",
       "nome": "stringa-a-b-c-ogni-3",
-      "cartella": "cartella-mulccgaq-rftnl8"
+      "cartella": "cartella-mulccgaq-rftnl8",
+      "descrizione": ""
     },
     {
       "file": "stringa-ab-dopo-la-terza-b-consecutiva-diventa-c.json",
       "nome": "stringa-ab-dopo-la-terza-b-consecutiva-diventa-c",
-      "cartella": "cartella-mulccgaq-rftnl8"
+      "cartella": "cartella-mulccgaq-rftnl8",
+      "descrizione": ""
     },
     {
       "file": "stringa-ab-ultima-c.json",
       "nome": "stringa-ab-ultima-c",
-      "cartella": "cartella-mulccgaq-rftnl8"
+      "cartella": "cartella-mulccgaq-rftnl8",
+      "descrizione": ""
     },
     {
       "file": "numero-successivo-base-2.json",
       "nome": "numero successivo base 2",
-      "cartella": "cartella-muldtk0m-qwgpbl"
+      "cartella": "cartella-muldtk0m-qwgpbl",
+      "descrizione": ""
     },
     {
       "file": "numero-successivo-base-10.json",
       "nome": "numero successivo base 10",
-      "cartella": "cartella-muldu0wf-010uz7"
+      "cartella": "cartella-muldu0wf-010uz7",
+      "descrizione": "puntatore parte da destra"
     },
     {
       "file": "stringa-ab-ultima-b-diventa-c.json",
       "nome": "Stringa AB, ultima B diventa C",
-      "cartella": "cartella-mulccgaq-rftnl8"
+      "cartella": "cartella-mulccgaq-rftnl8",
+      "descrizione": ""
     },
     {
       "file": "and.json",
       "nome": "AND",
-      "cartella": "cartella-mumpx001-17qn4t"
+      "cartella": "cartella-mumpx001-17qn4t",
+      "descrizione": ""
     },
     {
       "file": "or.json",
       "nome": "OR",
-      "cartella": "cartella-mumpx001-17qn4t"
+      "cartella": "cartella-mumpx001-17qn4t",
+      "descrizione": ""
     },
     {
       "file": "not.json",
       "nome": "NOT",
-      "cartella": "cartella-mumpx001-17qn4t"
+      "cartella": "cartella-mumpx001-17qn4t",
+      "descrizione": ""
     }
   ]
 }
