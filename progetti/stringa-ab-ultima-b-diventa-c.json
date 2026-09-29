@@ -1,0 +1,30 @@
+{
+  "nome": "Stringa AB, ultima B diventa C",
+  "stato": "0",
+  "alfabeto": [
+    "A",
+    "B",
+    "C",
+    "*"
+  ],
+  "stati": [
+    "0",
+    "1"
+  ],
+  "transizioni": {
+    "0|A": "A,0,d",
+    "0|B": "B,0,d",
+    "0|C": "",
+    "0|*": "*,1,s",
+    "1|A": "A,1,s",
+    "1|B": "C,fine,d",
+    "1|C": "",
+    "1|*": "*,fine,s",
+    "fine|A": "",
+    "fine|B": "",
+    "fine|C": "",
+    "fine|*": ""
+  },
+  "posizioneIniziale": 0,
+  "cartella": "cartella-mulccgaq-rftnl8"
+}
