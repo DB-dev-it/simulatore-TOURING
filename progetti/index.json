@@ -102,6 +102,11 @@
       "file": "or.json",
       "nome": "OR",
       "cartella": ""
+    },
+    {
+      "file": "not.json",
+      "nome": "NOT",
+      "cartella": ""
     }
   ]
 }
