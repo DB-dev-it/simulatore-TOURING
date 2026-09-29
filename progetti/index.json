@@ -97,6 +97,11 @@
       "file": "and.json",
       "nome": "AND",
       "cartella": ""
+    },
+    {
+      "file": "or.json",
+      "nome": "OR",
+      "cartella": ""
     }
   ]
 }
