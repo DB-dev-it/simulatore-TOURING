@@ -92,6 +92,11 @@
       "file": "stringa-ab-ultima-b-diventa-c.json",
       "nome": "Stringa AB, ultima B diventa C",
       "cartella": "cartella-mulccgaq-rftnl8"
+    },
+    {
+      "file": "and.json",
+      "nome": "AND",
+      "cartella": ""
     }
   ]
 }
